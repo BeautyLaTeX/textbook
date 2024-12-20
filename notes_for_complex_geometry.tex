@@ -1,0 +1,290 @@
+\documentclass[lang=en,12pt,twoside]{textbook}
+% ----------------------------- Math Font ------------------------------------- %
+\usepackage[T1]{fontenc}
+\usepackage{times,anyfontsize}
+\let\heavymath\relax
+\usepackage{amssymb}
+\let\Bbbk\relax
+\usepackage{mtpro2}
+\DeclareSymbolFont{CMlargesymbols}{OMX}{cmex}{m}{n}
+\let\sum\relax
+\let\prod\relax
+\DeclareMathSymbol{\sum}{\mathop}{CMlargesymbols}{"50}
+\DeclareMathSymbol{\prod}{\mathop}{CMlargesymbols}{"51}
+%% \infty
+\DeclareSymbolFont{symbolsCM}{OMS}{cmsy}{m}{n}
+\SetSymbolFont{symbolsCM}{bold}{OMS}{cmsy}{b}{n}
+
+\DeclareMathSymbol{\infty}{\mathord}{symbolsCM}{"31}
+% ---------------------------------------------------------------------------- %
+% \overfullrule=5pt
+% \showboxdepth=\maxdimen
+% \showboxbreadth=\maxdimen
+\tracingonline=1
+\tracingoutput=1
+
+\DeclareMathOperator*{\res}{Res} %定义带上下标的运算符,这种方法会将下标和上标正确地排版到运算符的下方和上方，而不是像普通函数一样排版到右下角和右上角。
+\begin{document}
+%----------------------------------------------------------------------------------------
+%	标题页信息
+%----------------------------------------------------------------------------------------
+\title{Reading Paper}
+\subtitle{\textit{Notes for some books and papers}}
+\author{Ethan Lu}
+\date{\today}
+\publishers{Textbook}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%	插入自定义标题页
+%----------------------------------------------------------------------------------------
+\begin{titlepage} % 创建一个新的页面
+%用来将图片从左下角开始平铺整个封面
+	\AddToShipoutPicture*{%
+	\AtPageLowerLeft{%
+		\adjustbox{width=1.1\paperwidth, height=1.5\paperheight, keepaspectratio}{% 强制图片至纸张尺寸，但可能裁切
+			\includegraphics{images/pexels-photo-3378916.jpeg}
+		}
+	}
+}
+\begin{flushleft} % 左对齐环境
+	\setlength{\leftskip}{1cm} % 左侧缩进
+	\makeatletter % 允许访问带有@字符的内部命令
+	% \vspace*{4cm} % 标题距离页面顶端的空白
+	% {\color{white}\Huge \textbf{\@title} \par} % 使用前文定义的title作为标题
+	% \vspace{1cm} % 标题和子标题的间距
+	% {\color{white}\Large \@subtitle \par} % 使用前文定义的subtitle作为子标题
+	% \vfill % 作者信息前的垂直填充
+	% {\color{white}\large \@author \par} % 作者名
+	% {\color{white}\large \@publishers \par} % 出版者
+	% {\color{white}\large \today\par} % 日期，默认为当天
+        \begin{tikzpicture}[overlay,remember picture]
+        \begin{pgfonlayer}{bottom}
+            \fill[dblue!10,opacity=0.1] (current page.south west) rectangle ++(\paperwidth,2cm);
+            \node[inner sep=0pt,text=white,font=\large\sffamily,above] (bottominfo) at ([yshift=.7cm]current page.south) {
+                \@author\hspace{4cm}\@publishers\hspace{4cm}\today
+            };
+        \end{pgfonlayer}
+        \fill[color=black!50,opacity=.2]node[append after command={
+            ([yshift=0.5cm]bookinfo.north west) rectangle ([yshift=-0.5cm]bookinfo.south east)},minimum width=\paperwidth,opacity=1,align=left,inner sep=0pt,anchor=west] (bookinfo) at ([shift={(0,4cm)}]current page.west) {\hspace{-7cm}
+                \begin{varwidth}{\linewidth}
+                    \setlength\baselineskip{3ex}
+                    \textcolor{black!10!white}{\Huge \textbf{\@title}} \\[.6cm]
+                    \textcolor{black!10!white}{\Large \@subtitle}
+                \end{varwidth}
+                };
+    \end{tikzpicture}
+	\makeatother % 将@重置为非字母字符
+	\vspace{0cm} % 标题和子标题的间距
+	% 结束左对齐环境
+\end{flushleft}
+\ClearShipoutPicture % 清除背景图片
+\end{titlepage}
+% --------------------------------- 主要内容写在下面 --------------------------------- %
+\pagestyle{Mainpage} % 页面样式
+\chapimg{images/pexels-photo-1452701.jpeg}
+
+\begin{titlepage}
+    \newgeometry{left=2cm,right=2cm,top=2.5cm,bottom=2.2cm}
+    \tableofcontents
+    \restoregeometry
+\end{titlepage}
+
+% ---------------------------------------------------------------------------- %
+
+\partimg{images/pexels-photo-931018.jpeg}
+\part{New Topics}
+
+
+\chapter{Notes for some new topics}
+
+\section{Perverse Sheaf and Intersection Cohomology}
+
+\subsection{Poincar\'e Duality}
+
+\begin{definition}[cap product]
+    On an $n$-manifold $X$, the \emph{cap product} is 
+    \[C^i(X)\times C_n(X)\xlongrightarrow[]{\frown} C_{n-i}(X),\]
+    where $C_i$ and $C^i$ denote the (simplicial/singular) $i$-(co)chains on $X$ with $\mathbb{Z}_{\text {- }}$ coefficients.
+\end{definition}
+
+The cap product is defined as follows: if $a \in C^{n-i}(X), b \in C^i(X)$, and $\sigma \in C_n(X)$ then
+
+$$
+a(b \frown \sigma)=(a \smile b)(\sigma).
+$$
+
+
+The cap product is compatible with the boundary maps, thus it descends to a map
+
+$$
+H^i(X ; \mathbb{Z}) \times H_n(X ; \mathbb{Z}) \xrightarrow{\frown} H_{n-i}(X ; \mathbb{Z}).
+$$
+
+
+The following statement lies at the heart of algebraic and geometric topology. For a modern proof see, e.g.,  \cite[Section 3.3]{hatcher2002algebraic}:
+\begin{theorem}[Poincaré Duality]\label{thm:pd}
+    Let $X$ be a closed, connected, oriented topological n-manifold with fundamental class $[X]$. Then capping with $[X]$ gives an isomorphism
+$$
+H^i(X ; \mathbb{Z}) \xrightarrow{\cong} H_{n-i}(X ; \mathbb{Z})
+$$
+for all integers $i$.
+\end{theorem}
+    As a consequence of Theorem \ref{thm:pd} one gets a non-degenerate pairing
+$$
+H_i(X, \mathbb{C}) \otimes H_{n-i}(X ; \mathbb{C}) \longrightarrow \mathbb{C}.
+$$
+In particular, the Betti numbers\sidenote{It is known as the rank of the corresponding homology groups.} of $X$ in complementary degrees coincide, i.e.,
+$$
+\operatorname{dim}_{\mathbb{C}} H_i(X ; \mathbb{C})=\operatorname{dim}_{\mathbb{C}} H_{n-i}(X ; \mathbb{C}).
+$$
+Note that the existence of Hodge structures on the cohomology of complex projective manifolds leads to an important consequence that the odd Betti numbers of a complex projective manifold are even. 
+
+
+\subsection{Understanding Why the Odd Betti Numbers of a Complex Projective Manifold are Even?}
+
+For a complex projective manifold, the odd Betti numbers are always even. This can be understood through a combination of complex geometry and topological properties. Let’s break this down in detail:
+
+\begin{enumerate}
+\item \textbf{Definition of Betti Numbers:}
+Betti numbers, denoted as $b_k$, quantify the topology of a manifold by representing the rank of the $k$-th homology group $H_k(M, \mathbb{Z})$ (or the $k$-th cohomology group $H^k(X;\bZ)$). They indicate the number of $k$-dimensional "holes" or independent cycles in the manifold. For instance, $b_0$ represents the number of connected components, $b_1$ represents the number of independent loops, and so on.
+
+\item \textbf{Complex Projective Manifolds:}
+A complex projective manifold is a complex manifold that can be embedded into complex projective space. These manifolds have a rich structure and are inherently Kähler manifolds, meaning they have a compatible triple structure of a complex structure, a symplectic structure, and a Riemannian metric.
+
+\item \textbf{Hodge Decomposition:}
+For a Kähler manifold $M$, the complex de Rham cohomology group $H^k(M, \mathbb{C})$ can be decomposed into a direct sum of Hodge components:
+
+$$
+H^k(M, \mathbb{C}) = \bigoplus_{p+q=k} H^{p,q}(M)
+$$
+
+Here, $H^{p,q}(M)$ denotes the space of harmonic forms of type $(p, q)$, and $h^{p,q} = \dim H^{p,q}(M)$ are the Hodge numbers.
+
+\item \textbf{Relation Between Betti Numbers and Hodge Numbers:}
+The $k$-th Betti number $b_k$ is related to the Hodge numbers $h^{p,q}$ by the following formula:
+
+$$
+b_k = \sum_{p+q=k} h^{p,q}
+$$
+
+\item \textbf{Symmetry of Hodge Numbers:}
+For Kähler manifolds, there is a fundamental symmetry in the Hodge numbers:
+
+$$
+h^{p,q} = h^{q,p}
+$$
+
+This symmetry implies that the Hodge components $H^{p,q}$ and $H^{q,p}$ appear in pairs.
+
+\item \textbf{Implication for Odd Betti Numbers:}
+Due to the symmetry $h^{p,q} = h^{q,p}$, the sum of Hodge numbers for odd $k$ (such as $b_1$, $b_3$, etc.) will always be an even number because each non-zero $h^{p,q}$ has a matching $h^{q,p}$. Thus, the odd Betti numbers must be even.
+
+\item \textbf{Example:}
+Consider the complex projective space $\mathbb{CP}^n$. The Hodge numbers are as follows:
+\begin{itemize}
+    \item $h^{0,0} = 1$
+    \item $h^{1,1} = 1$
+    \item $h^{2,2} = 1$ (if $n \geq 2$)
+    \item All other $h^{p,q} = 0$.
+\end{itemize}
+
+The Betti numbers calculated are:
+\begin{itemize}
+    \item $b_0 = h^{0,0} = 1$
+    \item $b_2 = h^{1,1} = 1$
+    \item $b_4 = h^{2,2} = 1$ (for $n \geq 2$)
+    \item The odd Betti numbers $b_1 = b_3 = 0$.
+\end{itemize}
+
+This example shows that odd Betti numbers are zero (which is even) for $\mathbb{CP}^n$.
+
+\item \textbf{Conclusion:}
+In summary, the reason the odd Betti numbers of a complex projective manifold are even is due to the Hodge decomposition and the inherent symmetry of Hodge numbers on Kähler manifolds.
+\end{enumerate}
+% ---------------------------------------------------------------------------- %
+
+\begin{remark}
+    \upshape
+    In the diagram, $\delta$ is labeled as a \textbf{meridian}, and $\eta$ is labeled as a \textbf{longitude}. The reason why the homology class of $\delta$ vanishes can be explained from the perspective of algebraic topology.
+
+1. \textbf{Meridian as a Boundary}:
+   From the diagram, the meridian $\delta$ appears to be the boundary of a region. In homology theory, any curve that forms the boundary of a region has a \textbf{trivial homology class} (i.e., it vanishes). This is because a boundary does not represent a closed, independent cycle—it is merely the edge of a higher-dimensional region. In other words, since $\delta$ bounds some region within $X$, it is a boundary, and hence its homology class must vanish.
+
+2. \textbf{Boundaries and Homology in Algebraic Topology}:
+   In homology theory, the boundary of a higher-dimensional object always has a zero homology class. For example, in the case of a surface, if a loop (like the meridian $\delta$) is the boundary of a region, its homology class is trivial because it does not represent a free, closed cycle but rather a boundary.
+
+3. \textbf{Betti Number and Hodge Decomposition}:
+   The passage also mentions that $\delta$'s homology class vanishes, and this is related to the fact that the first Betti number $b_1$ of $X$ is odd. According to Hodge theory, if the first Betti number is odd, a complete Hodge decomposition cannot exist. This implies that certain homology classes in $H^1(X;\mathbb{C})$ cannot be fully decomposed into pure $(1,0)$ and $(0,1)$ components. This is connected to the fact that $\delta$'s homology class vanishes in the homology of $X$.
+
+\textbf{Summary:}\begin{enumerate}
+\item The meridian $\delta$ is the boundary of some region, and by the fundamental property of homology, \textbf{any boundary has a trivial homology class}.
+\item This follows from basic algebraic topology, where boundaries do not contribute to non-trivial homology classes.
+\item Additionally, the fact that $X$ has an odd first Betti number implies that a full Hodge decomposition is not possible for $H^1(X;\mathbb{C})$, which further supports why the homology class of $\delta$ is trivial.
+\end{enumerate}
+\end{remark}
+\subsection{Lefschetz Hyperplane Section Theorem}
+
+A map $f: X\to Y$ is called \textbf{homotopy equivalence} if  there is a map $g: Y\to X$ such that $fg\cong \bI$ and $gf\cong \bI$. It is an equivalent relation and $X$ and $Y$ are homotopy equivalent if they are the deformation retracts of the third space $Z$ containing them. In general, we can take $Z$ as the mapping Cylinder $M_f$ of any homotopy equivalence $f: X\to Y$. As we know that $M_f$ deformation retracts to $Y$, it suffices to prove that $M_f$ also deformation retracts to its other end $X$.
+
+\subsection{Hard Lefschetz Theorem}
+
+Let $X$ be a nonsingular complex projective variety of complex dimension $n$, and let $H$ be a generic hyperplane. The intersection $X \cap H$ yields a homology class $[X \cap H] \in H_{2 n-2}(X ; \mathbb{Z})$, and its Poincaré dual is a degree-two cohomology class, denoted by $[H] \in H^2(X ; \mathbb{Z})$. The Lefschetz operator is the map
+
+$$
+L: H^i(X ; \mathbb{C}) \xrightarrow{\smile[H]} H^{i+2}(X ; \mathbb{C})
+$$
+
+defined by taking the cup product with $[H]$. Then the following important result holds:
+
+\begin{theorem}[Hard Lefschetz Theorem]\label{thm:hard-lefschtz}
+    The map
+$$
+L^i: H^{n-i}(X ; \mathbb{C}) \xrightarrow{\smile[H]^i} H^{n+i}(X ; \mathbb{C})
+$$
+is an isomorphism, for all integers $i \geq 0$.
+\end{theorem}
+
+
+
+
+
+
+No, the statement as written is not generally correct. Let’s carefully analyze the situation.
+
+The ``residue'' of a function $ f(z,w) $ with respect to $ w $ at a root $ b_i $ is related to the partial derivative of $ f $ with respect to $ w $. Specifically, for a fixed $ z $, if $ f(z,w) $ has roots $ w = b_1, b_2, \dots, b_d $, then the residue of $ f $ at $ w = b_i $ is given by:
+$$
+\res_{w=b_i} \left( \frac{1}{f(z,w)} \right) = \frac{1}{\frac{\partial f}{\partial w}(z, b_i)}.
+$$
+
+The residue you seem to be referring to might be the  \textbf{sum of the residues}. The sum of the residues of a meromorphic function $ \frac{1}{f(z,w)} $ over all its poles $ w = b_1, \dots, b_d $ (roots of $ f(z, w) = 0 $) is given by:
+$$
+\sum_{i=1}^d \res_{w=b_i} \left( \frac{1}{f(z,w)} \right).
+$$
+
+Using the residue theorem, this sum is typically related to the behavior of $ f(z,w) $ at infinity or some global property, but it is not simply the sum of the roots $ b_1 + b_2 + \dots + b_d $.
+
+ \textbf{Important Note}:
+
+If $ f(z,w) $ is a polynomial in $ w $ of degree $ d $, then  \textbf{\textit{Viète's formulas}} imply that the sum of the roots $ b_1 + b_2 + \dots + b_d $ is given by the coefficient of $ w^{d-1} $ (up to a sign) in $ f(z,w) $, divided by the leading coefficient of $ w^d $. This is unrelated to residues.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newgeometry{left=2cm,right=2cm,bottom=2cm,top=3cm}
+%
+\printbibliography[heading=bibintoc]
+ %
+\end{document}

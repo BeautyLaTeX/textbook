@@ -1,0 +1,851 @@
+\documentclass[lang=en,12pt,twoside]{textbook}
+% ----------------------------- Math Font ------------------------------------- %
+\usepackage[T1]{fontenc}
+\usepackage{newtx,anyfontsize}
+\DeclareSymbolFont{CMlargesymbols}{OMX}{cmex}{m}{n}
+\let\sum\relax
+\let\prod\relax
+\DeclareMathSymbol{\sum}{\mathop}{CMlargesymbols}{"50}
+\DeclareMathSymbol{\prod}{\mathop}{CMlargesymbols}{"51}
+%% \infty
+\DeclareSymbolFont{symbolsCM}{OMS}{cmsy}{m}{n}
+\SetSymbolFont{symbolsCM}{bold}{OMS}{cmsy}{b}{n}
+\let\txinfty\infty
+\DeclareMathSymbol{\infty}{\mathord}{symbolsCM}{"31}
+\definecolor{nuanbai}{HTML}{f5f5f5}
+\pagecolor{lightgray!6}
+% ---------------------------------------------------------------------------- %
+% \overfullrule=5pt
+% \showboxdepth=\maxdimen
+% \showboxbreadth=\maxdimen
+\tracingonline=1
+\tracingoutput=1
+
+\addbibresource{ref.bib}
+% 定义紧密双内积符号
+\newcommand{\llangle}{\left\langle\!\left\langle}
+\newcommand{\rrangle}{\right\rangle\!\right\rangle}
+
+% fullwidth environment, text across textwidth+marginparsep+marginparwidth
+\newlength{\overhang}
+\setlength{\overhang}{\marginparwidth}
+\addtolength{\overhang}{\marginparsep}
+%
+\newenvironment{fullwidth}
+  {\ifthenelse{\boolean{@twoside}}%
+     {\begin{adjustwidth*}{}{-\overhang}}%
+     {\begin{adjustwidth}{}{-\overhang}}%
+  }%
+  {\ifthenelse{\boolean{@twoside}}%
+    {\end{adjustwidth*}}%
+    {\end{adjustwidth}}%
+  }
+% ----------------------------------- 公式专用 ----------------------------------- %
+
+\NewDocumentEnvironment{fulleq}{}%
+  {
+   \checkoddpage
+   \ifoddpage
+     % 奇数页：左侧调整宽度
+     \begin{adjustwidth}{-\dimexpr\marginparwidth+\marginparsep\relax}{0pt}
+   \else
+     % 偶数页：右侧调整宽度
+     \begin{adjustwidth}{0pt}{-\dimexpr\marginparwidth+\marginparsep\relax}
+   \fi
+   \noindent
+  }%
+  {\end{adjustwidth}}
+
+% ---------------------------------------------------------------------------- %
+\begin{document}
+%----------------------------------------------------------------------------------------
+%	标题页信息
+%----------------------------------------------------------------------------------------
+\title{Research Paper Comments}
+\subtitle{\textit{\texorpdfstring{$L^q$}{L square}-extension theorem for jets on weakly pseudoconvex k\"ahler manifolds}}
+\author{Ethan Lu}
+\date{\today}
+\publishers{Textbook}
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%	插入自定义标题页
+%----------------------------------------------------------------------------------------
+\begin{titlepage} % 创建一个新的页面
+%用来将图片从左下角开始平铺整个封面
+	\AddToShipoutPicture*{%
+	\AtPageLowerLeft{%
+		\adjustbox{width=1.1\paperwidth, height=1.5\paperheight, keepaspectratio}{% 强制图片至纸张尺寸，但可能裁切
+			\includegraphics{images/pexels-photo-3378916.jpeg}
+		}
+	}
+}
+\begin{flushleft} % 左对齐环境
+	\setlength{\leftskip}{1cm} % 左侧缩进
+	\makeatletter % 允许访问带有@字符的内部命令
+	% \vspace*{4cm} % 标题距离页面顶端的空白
+	% {\color{white}\Huge \textbf{\@title} \par} % 使用前文定义的title作为标题
+	% \vspace{1cm} % 标题和子标题的间距
+	% {\color{white}\Large \@subtitle \par} % 使用前文定义的subtitle作为子标题
+	% \vfill % 作者信息前的垂直填充
+	% {\color{white}\large \@author \par} % 作者名
+	% {\color{white}\large \@publishers \par} % 出版者
+	% {\color{white}\large \today\par} % 日期，默认为当天
+        \begin{tikzpicture}[overlay,remember picture]
+        \begin{pgfonlayer}{bottom}
+            \fill[dblue!10,opacity=0.1] (current page.south west) rectangle ++(\paperwidth,2cm);
+            \node[inner sep=0pt,text=white,font=\large\sffamily,above] (bottominfo) at ([yshift=.7cm]current page.south) {
+                \@author\hspace{4cm}\@publishers\hspace{4cm}\today
+            };
+        \end{pgfonlayer}
+        \fill[color=black!50,opacity=.2]node[append after command={
+            ([yshift=0.5cm]bookinfo.north west) rectangle ([yshift=-0.5cm]bookinfo.south east)},minimum width=\paperwidth,opacity=1,align=left,inner sep=0pt,anchor=west] (bookinfo) at ([shift={(0,4cm)}]current page.west) {\hspace{-7cm}
+                \begin{varwidth}{\linewidth}
+                    \setlength\baselineskip{4ex}
+                    \textcolor{black!10!white}{\Huge \textbf{\@title}} \\[.6cm]
+                    \textcolor{black!10!white}{\Large \@subtitle}
+                \end{varwidth}
+                };
+    \end{tikzpicture}
+	\makeatother % 将@重置为非字母字符
+	\vspace{0cm} % 标题和子标题的间距
+	% 结束左对齐环境
+\end{flushleft}
+\ClearShipoutPicture % 清除背景图片
+\end{titlepage}
+% --------------------------------- 主要内容写在下面 --------------------------------- %
+\pagestyle{Mainpage} % 页面样式
+\chapimg{images/pexels-photo-1452701.jpeg}
+
+\begin{titlepage}
+    \newgeometry{left=2cm,right=2cm,top=2.5cm,bottom=2.2cm}
+    \tableofcontents
+    \restoregeometry
+\end{titlepage}
+
+% ---------------------------------------------------------------------------- %
+
+\partimg{images/pexels-photo-931018.jpeg}
+\part{Proof of Opennes Conjecture}
+
+
+\chapter{\texorpdfstring{$L^q$}{L square}-extension theorem for jets on weakly pseudoconvex k\"ahler manifolds}
+
+\section{Introduction}
+T. Ohsawa-K. Takegoshi established a remarkable extension theorem of holomorphic functions defined on a bounded pseudoconvex domain in $\mathbb{C}^n$ with growth control in \cite{OhsawaTakegoshi1987}. Since then, many versions and variants of the $L^2$ extension theorems have been studied (see  \cite{BZ13,Manivel1993,MV06,Popovici2004L2EF,ZZ18}, etc.). These results lead to numerous applications in algebraic geometry and complex analysis.
+
+One interesting problem is to study the $L^2$ extension theorem for jets. The first such result was given by D. Popovici \cite{Popovici2004L2EF}, which generalized the $L^2$ extension theorems of Ohsawa-Takegoshi-Manivel to the case of jets of sections of a line bundle over a weakly pseudoconvex Kähler manifold. Then J.-P. Demailly \cite{Demailly2015} considered the extension from more general non-reduced varieties. Following a new method of B. Berndtsson-L. Lempert \cite{BB14}, G. Hosono \cite{HG17} proved an $L^2$ extension theorem for jets with optimal estimate on a bounded pseudoconvex domain in $\mathbb{C}^n$ (see also \cite{MJV17}).
+
+The idea of considering variable denominators was first introduced by J. McNeal-D. Varolin \cite{MV06}. They obtained some results on weighted $L^2$ extension of holomorphic top forms with values in a holomorphic line bundle, where the weights used are determined by the variable denominators. Recently, X. Zhou-L. Zhu \cite{ZZ18} proved an $L^2$ extension theorem for holomorphic sections of holomorphic line bundles equipped with singular metrics on weakly pseudoconvex Kähler manifolds. Furthermore, they obtained optimal constants corresponding to variable denominators.
+
+The method of solving undetermined functions with ODEs was first used in \cite{GZ12}. From then on, a lot of spectacular works appear along this line, such as \cite{GZ13,ZZ18,GZ18}, etc. Several optimal $L^2$ extension theorems have been proved in this process.
+
+The main goal of this paper\sidenote{An extended version of the theorem 1.2 in \cite{ZZ18} is demonstrated using the existing method.} is to apply the methods of Zhou-Zhu \cite{ZZ18} and Demailly \cite{Demailly2000} to $L^q$ jet extension to slightly generalize the theorem 1.2 in \cite{ZZ18}. As an application of our main theorem, we also obtain a corollary of a local $L^{\frac{2}{q}}$ extension theorem. 
+
+We make precise the setting for our work. Let $X$ be an $n$-dimensional weakly pseudoconvex manifold with K\"ahler metric $\omega$, and $E$ a Hermitian holomorphic vector bundle of rank $m \geq 1$ over $X$. Assume that $s \in H^0(X, E)$ is transverse to the zero section. Set
+$$
+Y:=\{x \in X: s(x)=0\} .
+$$
+
+Furthermore, let $L$ be a holomorphic line bundle equipped with a smooth Hermitian metric satisfying an appropriate positivity condition.
+
+We denote by $\bigwedge^{r, s} T_X^*$ the bundle of differential forms of bidegree $(r, s)$ on $X$, and $\mathcal{J}_Y$ the sheaf of germs of holomorphic functions on $X$ which vanish on $Y$. For any integer $k \geq 0$, let $\mathcal{O}_X / \mathcal{J}_Y^{k+1}$ be the nonlocally free sheaf of $k$-jets which are "transversal" to $Y$. Fix a point $y \in X$ and a Stein neighborhood $U$ in $X$ of $y$. Then this gives rise to a surjective morphism
+$$
+H^0\left(U, K_X \otimes L\right) \longrightarrow H^0\left(U, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}\right)
+$$
+of local section spaces, and an arbitrary local lifting $\tilde{f} \in H^0\left(U, K_X \otimes L\right)$ of $f$. For any transversal $k$-jet $f \in H^0\left(U, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}\right)$ and any weight function $\rho>0$ on $U$, the pointwise $\rho$-weighted norm associated to the section $s$, was defined by \cite[Definition 0.1.1]{Popovici2004L2EF}:
+ \begin{fullwidth}
+ $$
+ |f|_{s, \rho,(k)}^2(y):=|\tilde{f}|_L^2(y)+\frac{\left|\nabla^1 \tilde{f}\right|_L^2}{\left|\bigwedge^m(\dd s)\right|_E^{2 \frac{1}{m}} \rho^{2(m+1)}}(y)+\cdots+\frac{\left|\nabla^k \tilde{f}\right|_L^2}{\left|\bigwedge^m(\dd s)\right|_E^{2 \frac{k}{m}} \rho^{2(m+k)}}(y),
+ $$
+\end{fullwidth}
+and the $L_{(k)}^2$ weighted norm by:
+$$
+\|f\|_{s, \rho,(k)}^2=\int_Y \frac{|f|_{s, \rho,(k)}^2}{\left|\bigwedge^m(\dd s)\right|_E^2} \dd V_{Y, \omega} .
+$$
+
+Here for $i=0, \ldots, k, \nabla^i \widetilde{f}$ is constructed by induction as the projection of the $(1,0)$-part
+$$
+\nabla^{1,0}\left(\nabla^k \tilde{f}\right) \in C^{\infty}\left(U, K_X \otimes L \otimes S^{j-1} N_{Y / X}^* \otimes T_X^*\right)
+$$
+of $\nabla\left(\nabla^k \widetilde{f}\right)$ with the associated Chern connection $\nabla$ to $C^{\infty}\left(U, K_X \otimes L\right. $ $\left.\otimes S^j N_{Y / X}^*\right)$, induced by the surjective bundle morphism $\left.K_X \otimes L \otimes T_X^*\right|_Y$ $ \rightarrow K_X \otimes L \otimes N_{Y / X}^*$.
+
+It is worthwhile to notice that the norm $|f|_{s, \rho,(k)}^2$ of the $k$-jet $f$ at the point $y \in Y$ is independent of the choice of the local lifting $\tilde{f}$. Moreover, one has the following notations \cite[Notation 0.1.3]{Popovici2004L2EF}:
+\begin{enumerate}[label=(\alph*)]
+  \item For a transversal $k$-jet $f \in H^0\left(U, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}\right)$, denote $\nabla^j f:=\left(\nabla^j \widetilde{f}\right)_{\mid U \cap Y}$, for all $j=0, \ldots, k$ and an arbitrary lifting $\tilde{f} \in H^0\left(U, K_X \otimes L\right)$ of $f$.
+  \item For every integer $k \geq 0$, and every open set $U \subset X$, set
+$$
+J_U^k: H^0\left(U, K_X \otimes L\right) \longrightarrow H^0\left(U, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}\right)
+$$
+as the cohomology group morphism induced by the projection $\mathcal{O}_X \rightarrow \mathcal{O}_X / \mathcal{J}_Y^{k+1}$.
+\end{enumerate}
+We refer to \cite[pp. 2-5]{Popovici2004L2EF} for more details about the notations and the construction of relevant metrics on jets.
+
+In \cite[p. 136]{ZZ18}, Zhou-Zhu defined the \emph{variable denominators}. Let $\frakR$ be the class of functions defined by
+$$
+\left\{R \in C^{\infty}(-\infty, 0]: \begin{array}{c}
+R>0, \;R^{\prime} \leq 0,\; \int_{-\infty}^0 \frac{1}{R(t)} \mathrm{d} t<+\infty \\[.25em]
+\text { and } e^t R(t) \text { is bounded above on }(-\infty, 0]
+\end{array}\right\} .
+$$
+
+Denote $\int_{-\infty}^0 \frac{1}{R(t)} \mathrm{d} t$ by $C_R$. Notice that the function $R(t)$ equals to the function $\frac{1}{c_A(-t) e^t}$ defined just before the main theorems in \cite[p. 1143]{GZ12} when $A=0$.
+With such preparation, our main theorem is as follows\sidenote{The main innovation of this paper is the extension of Theorem 1.2 from \cite{ZZ18} to the jets case.}.
+
+%    Text of article.
+\begin{theorem}[Main Theorem]\label{thm:main}
+  Let $(X, \omega)$ be a weakly pseudoconvex complex n-dimensional manifold possessing a Kähler metric $\omega, \psi$ be a plurisubharmonic function on $X$, $E$ be a holomorphic vector bundle of rank $m$ over $X$ equipped with a smooth Hermitian metric $(1 \leq m\leq n)$, and $s$ be a global holomorphic section of $E$. Assume that $s$ is transverse to the zero section, and let
+$$
+Y:=\{x \in X: s(x)=0, \bigwedge^m (\dd s)(x)\neq 0\} .
+$$
+
+Let $L$ be a holomorphic line bundle over $X$ equipped with a singular Hermitian metric $h_L$, which is written locally as $e^{-\varphi_L}$ for some function $\varphi_L \in L_{\text {loc }}^1$ with respect to a local holomorphic frame of $L$. {\color{purple} Assume that $\frac{q}{2}\varphi_L+\br{1-\frac{q}{2}}\varphi_\omega+\psi$ is quasi-plurisubharmonic} and $\varphi_L$ is locally bounded above.  Let $0<q\leq 2$.  Moreover, assume that the $(1,1)$-form  \vspace{.25em}
+
+{\color{purple} {\upshape (i)} \vspace{.25em}$\frac{q}{2}\sqrt{-1} \Theta_L+\br{1-\frac{q}{2}}\sqrt{-1}\bd\bdd\varphi_\omega+ m\sqrt{-1} \partial \bar{\partial} \log |s|^2+\xu\bd\bdd \psi $ $\geq 0$ 
+holds on $X \backslash Y$,} 
+
+and that there is a continuous function $\alpha>0$ on $X$ such that the following two inequalities hold on $X \backslash Y$ :
+
+{\upshape (ii)} $\frac{q}{2}\displaystyle\sqrt{-1} \Theta_L+\br{1-\frac{q}{2}}\sqrt{-1}\bd\bdd\varphi_\omega+m\sqrt{-1} \partial \bar{\partial} \log |s|^2+\xu\bd\bdd \psi \geq \frac{\left\{\sqrt{-1} \Theta_E s, s\right\}_E}{\alpha|s|_E^2}$,
+
+{\upshape (iii)} $\psi+m\log |s|^2\leq-2 m\alpha$ 
+
+\noindent Then, for every relatively compact open subset $\Omega \subset X$, and every $k$-jet $f \in H^0\left(X, K_X\otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}\right)$ satisfying
+$$
+C_f :=\int_Y \frac{|f|_{s, \rho,(k)}^q e^{-\psi}}{\left|\bigwedge^m(d s)\right|^{2}_E }d V_{Y, \omega}<+\infty.
+$$
+Furthermore, assume that there exists $F_1^{(k)} \in H^0\left(X, K_X \otimes L\right)$ such that $J^k F_1^{(k)} =f$ and
+$$
+C_{F_1}:=\int_{\Omega} \frac{\left|F_1^{(k)}\right|_L^q e^{-\psi}}{|s|^{2m} R(\psi+m\log |s|^2)} d V_{X, \omega} < +\infty.
+$$
+Then there exists $F^{(k)} \in H^0\left(X, K_X \otimes L\right)$ such that $J^k F^{(k)}=f$ and
+$$
+\int_{\Omega} \frac{\left|F^{(k)}\right|_L^q e^{-\psi}}{|s|^{2m} R(\psi+m\log |s|^2)} d V_{X, \omega} \leq C_{m,R}^{(k)} C_f,
+$$
+where $C_{m,R}^{(k)}>0$ is a constant depending only on $m,R,k, E$, and $\sup _{\Omega}\|i \Theta_L\|$.
+
+\end{theorem}
+
+Let $p$ be a positive integer. If we take $q=\frac{2}{p}$ and replace $L$ by $K_X^{p-1}\otimes L$, which is equipped with the metric $e^{(p-1)\varphi_\omega-\varphi_L}$, then we can get from Main Theorem the following corollary.
+
+\begin{corollary}\label{cor:1}
+  Assume that $\frac{\varphi_L}{p}+\psi$ is quasi-plurisubharmonic and $\varphi_L$ is locally bounded above. Moreover, assume that\vspace{.25em}
+
+  {\upshape (i)}\vspace{.25em} \quad $\frac{\sqrt{-1} \Theta_L}{p}+\xu\bd\bdd\psi+m\sqrt{-1} \partial \bar{\partial} \log |s|^2 \geq 0$ holds on $X \backslash Y$,\newline
+  and that there is a continuous function $\alpha>0$ on $X$ such that the following two inequalities hold on $X \backslash Y$ :
+
+  {\upshape (ii)} \quad $\frac{\sqrt{-1} \Theta_L}{p}+\xu\bd\bdd\psi+m\sqrt{-1} \partial \bar{\partial} \log |s|^2\geq \frac{\left\{\sqrt{-1} \Theta_E s, s\right\}_E}{\alpha|s|_E^2}$,
+
+  {\upshape (iii)} \quad $\psi+m\log |s|^2 \leq-2 m \alpha$.
+  
+For every relatively compact open subset $\Omega\subset X$, and every  $k$-jet  $f\in H^0 (X,K_X^p\otimes L\otimes \mO_X/\mJ_Y^{k+1})$, such that
+  $$
+  C_f:=\int_Y \frac{\left(|f|_L\right)^{\frac{2}{p}} e^{-\psi}}{\left|\bigwedge^m(d s)\right|_E^2} d V_Y<+\infty .
+  $$
+  Furthermore, assume that there exists a $k$-jet  $F_1^{(k)}\in H^0(\Omega,K_X^p\otimes L)$  such that $J^k F_1^{(k)}=f$ and
+  $$
+  C_{F_1}:=\int_\Omega \frac{\left(\left|F_1^{(k)}\right|_L\right)^{\frac{2}{p}} e^{-\psi}}{|s|^{2m} R(\psi+m\log |s|^2)} d V_X<+\infty.
+  $$
+  Then there exists a $k$-jet  $F^{(k)}\in H^0(\Omega,K_X^p\otimes L)$, such that $J^k F^{(k)}=f$ and
+$$
+\int_\Omega \frac{\left(|F^{(k)}|_L\right)^{\frac{2}{p}} e^{-\psi}}{|s|^{2m} R(\psi+m\log |s|^2)} d V_X \leq C_{m,R}^{(k)}  C_f ,
+$$
+where $C_{m,R}^{(k)}>0$ is a constant depending only on $m,R,k, E$, and $\sup _{\Omega}\|i \Theta_L\|$.
+\end{corollary}
+
+
+\section{Preliminaries}
+\begin{lemma}[Baisc a priori inequality]\label{lem:priori-estimate}
+  Let $E$ be a hermitian vector bundle on a complex manifold $X$ equipped with a Kähler metric $\omega$. Let $\eta, \lambda>0$ be smooth functions on $X$. Then for every form $u \in \mathcal{D}\left(X, \bigwedge^{p, q} T_X^{\star} \otimes E\right)$ with compact support we have
+$$
+\begin{aligned}
+&\left\|\left(\eta^{\frac{1}{2}}+\lambda^{\frac{1}{2}}\right) D^{\prime \prime *} u\right\|^2  +\left\|\eta^{\frac{1}{2}} D^{\prime \prime} u\right\|^2+\left\|\lambda^{\frac{1}{2}} D^{\prime} u\right\|^2+2\left\|\lambda^{-\frac{1}{2}} d^{\prime} \eta \wedge u\right\|^2 \\
+& \geqslant\llangle\left[\eta \mathrm{i} \Theta(E)-\mathrm{i} d^{\prime} d^{\prime \prime} \eta-\mathrm{i} \lambda^{-1} d^{\prime} \eta \wedge d^{\prime \prime} \eta, \Lambda\right] u, u\rrangle .
+\end{aligned}
+$$
+\end{lemma}
+
+
+\begin{lemma}[$L^2$-existence theorem with erro term]\label{lem:L2existence}
+  Let $(X, \omega)$ be a complete K\"ahler manifold equipped with a (non-necessarily complete) K\"ahler metric $\omega$, and let $Q$ be a Hermitian vector bundle over $X$. Assume that $\tau$ and $A$ are smooth and bounded positive functions on $X$ and let $$\mathrm{B}:=\left[\tau \sqrt{-1} \Theta_Q-\sqrt{-1} \partial \bar{\partial} \tau-\sqrt{-1} A^{-1} \partial \tau \wedge \bar{\partial} \tau, \Lambda\right].$$ Assume that $\delta \geq 0$ is a number such that $\mathrm{B}+\delta \mathrm{I}$ is semi-positive definite everywhere on $\bigwedge^{n, q} T_X^* \otimes Q$ for some $q \geq 1$. Then given a form $g \in L^2\left(X, \bigwedge^{n, q} T_X^* \otimes Q\right)$ such that $\mathrm{D}^{\prime \prime} g=0$ and $$\int_X\left\langle(\mathrm{~B}+\delta \mathrm{I})^{-1} g, g\right\rangle_Q d V_X<+\infty,$$ there exists an approximate solution $u \in L^2\left(X, \bigwedge^{n, q-1} T_X^* \otimes Q\right)$ and a correcting term $h \in L^2\left(X, \right.$ $\left.\bigwedge^{n, q} T_X^* \otimes Q\right)$ such that $\mathrm{D}^{\prime \prime} u+\sqrt{\delta} h=g$ and
+$$
+\int_X \frac{|u|_Q^2}{\tau+A} d V_X+\int_X|h|_Q^2 d V_X \leq \int_X\left\langle(\mathrm{~B}+\delta \mathrm{I})^{-1} g, g\right\rangle_Q d V_X .
+$$
+\end{lemma}
+
+\begin{proof}
+  By lemma \ref{lem:priori-estimate}, lemma \ref{lem:L2existence} can be obtained by almost the same arguments as in \cite{Demailly2000}, where the term $\int_X\left\langle(\mathrm{~B}+\delta \mathrm{I})^{-1} g, g\right\rangle_Q d V_X$ in the above inequality is written as $2 \int_X\left\langle(\mathrm{~B}+\delta \mathrm{I})^{-1} g, g\right\rangle_Q d V_X$.
+\end{proof}
+
+% \begin{proof}[The proof in \cite{Demailly2000}]
+%   Let $v \in L^2\left(X, \Lambda^{n, q} T_X^{\star} \otimes E\right)$ be an arbitrary element. Assume first that $\omega$ is complete, so that $\left(\operatorname{Ker} D^{\prime \prime}\right)^{\perp}=\overline{\operatorname{Im} D^{\prime \prime *}} \subset \operatorname{Ker} D^{\prime \prime *}$. Then, by using the decomposition $v=v_1+v_2 \in\left(\operatorname{Ker} D^{\prime \prime}\right) \oplus\left(\operatorname{Ker} D^{\prime \prime}\right)^{\perp}$ and the fact that $g \in \operatorname{Ker} D^{\prime \prime}$, we infer from Cauchy-Schwarz the inequality
+% $$
+% |\langle g, v\rangle|^2=\left|\left\langle g, v_1\right\rangle\right|^2 \leqslant \int_X\left\langle B^{-1} g, g\right\rangle d V_\omega \int_X\left\langle B v_1, v_1\right\rangle d V_\omega .
+% $$
+
+% We have $v_2 \in \operatorname{Ker} D^{\prime \prime *}$, hence $D^{\prime \prime *} v=D^{\prime \prime *} v_1$, and \autoref{lem:priori-estimate} implies
+% $$
+% \int_X\left\langle B v_1, v_1\right\rangle d V_\omega \leqslant\left\|\left(\eta^{\frac{1}{2}}+\lambda^{\frac{1}{2}}\right) D^{\prime \prime *} v_1\right\|^2+\left\|\eta^{\frac{1}{2}} D^{\prime \prime} v_1\right\|^2=\left\|\left(\eta^{\frac{1}{2}}+\lambda^{\frac{1}{2}}\right) D^{\prime \prime \star} v\right\|^2
+% $$
+% provided that $v \in \operatorname{Dom} D^{\prime \prime \star}$. Combining both, we find
+% $$
+% |\langle g, v\rangle|^2 \leqslant\left(\int_X\left\langle B^{-1} g, g\right\rangle d V_\omega\right)\left\|\left(\eta^{\frac{1}{2}}+\lambda^{\frac{1}{2}}\right) D^{\prime \prime *} v\right\|^2 .
+% $$
+
+% This shows the existence of an element $w \in L^2\left(X, \Lambda^{n, q} T_X^{\star} \otimes E\right)$ such that
+% $$
+% \begin{aligned}
+% \|w\|^2 & \leqslant \int_X\left\langle B^{-1} g, g\right\rangle d V_\omega \quad \text { and } \\
+% \langle\langle v, g\rangle\rangle & =\left\langle\left(\eta^{\frac{1}{2}}+\lambda^{\frac{1}{2}}\right) D^{\prime \prime \star} v, w\right\rangle \quad \forall g \in \operatorname{Dom} D^{\prime \prime} \cap \operatorname{Dom} D^{\prime \prime *} .
+% \end{aligned}
+% $$
+
+% As $\left(\eta^{1 / 2}+\lambda^{\frac{1}{2}}\right)^2 \leqslant 2(\eta+\lambda)$, it follows that $f=\left(\eta^{1 / 2}+\lambda^{\frac{1}{2}}\right) w$ satisfies $D^{\prime \prime} f=g$ as well as the desired $L^2$ estimate. If $\omega$ is not complete, we set $\omega_{\varepsilon}=\omega+\varepsilon \widehat{\omega}$ with some complete Kähler metric $\widehat{\omega}$. The final conclusion is then obtained by passing to the limit and using a monotonicity argument (the integrals are monotonic with respect to $\varepsilon$ ). The technique is quite standard and entirely similar to the approach described in [Dem82a], so we will not give any detail here.
+% \end{proof}
+
+
+\begin{lemma}[The property of psh function]
+  Let $X$ be a Stein manifold and $\varphi$ be a plurisubharmonic function on $X$. Then there exists a decreasing sequence of smooth strictly plurisubharmonic functions $\left\{\varphi_j\right\}_{j=1}^{+\infty}$ such that $\lim _{j \rightarrow+\infty} \varphi_j=\varphi$
+\end{lemma}
+
+\begin{lemma}[Theorem 1.5 in \cite{Demailly1982}]\label{lem:3.5}
+  Let $X$ be a Kähler manifold, and $Z$ be an analytic subset of $X$. Assume that $\Omega$ is a relatively compact open subset of $X$ possessing a complete Kähler metric. Then $\Omega \backslash Z$ carries a complete Kähler metric.
+\end{lemma}
+
+\begin{lemma}[Theorem 4.4.2 in \cite{Hormander1990}]
+  Let $\Omega$ be a pseudoconvex open set in $\mathbb{C}^n$, and $\varphi$ be a plurisubharmonic function on $\Omega$. For every $h \in$ $L_{(p, q+1)}^2(\Omega, \varphi)$ with $\bar{\partial} h=0$ there is a solution $v \in L_{(p, q)}^2(\Omega, \textrm{loc} )$ of the equation $\bar{\partial} v=h$ such that
+$$
+\int_{\Omega} \frac{|v|^2}{\left(1+|z|^2\right)^2} e^{-\varphi} d V \leq \int_{\Omega}|h|^2 e^{-\varphi} d V
+$$
+\end{lemma}
+
+\begin{lemma}[Lemma 6.9 in \cite{Demailly1982}]\label{lem:6}
+  Let $\Omega$ be an open subset of $\mathbb{C}^n$ and $Z$ be a complex analytic subset of $\Omega$. Assume that $v$ is a $(p, q-1)$-form with $L_{\text {loc }}^2$ coefficients and $h$ is a $(p, q)$-form with $L_{\textrm{loc}}^1$ coefficients such that $\bar{\partial} v=h$ on $\Omega \backslash Z$ (in the sense of distribution theory). Then $\bar{\partial} v=h$ on $\Omega$.
+\end{lemma}
+
+% \begin{lemma}[strong openness conjecture, see [17]]
+%   Let $\varphi$ be a negative plurisubharmonic function on the unit polydisk $\Delta^n \subset \mathbb{C}^n$. Assume that $F$ is a holomorphic function on $\Delta^n$ satisfying
+%   $$
+%   \int_{\Delta^n}|F|^2 e^{-\varphi} d V_n<+\infty,
+%   $$
+%   where $d V_n$ is the $2 n$-dimensional Lebesgue measure on $\mathbb{C}^n$. Then there exists $r \in(0,1)$ and $\beta \in(0,+\infty)$ such that
+%   $$
+%   \int_{\Delta_r^n}|F|^2 e^{-(1+\beta) \varphi} d V_n<+\infty,
+%   $$
+%   where $\Delta_r^n:=\left\{\left(z^1, \cdots, z^n\right) \in \mathbb{C}^n:\left|z^k\right|<r, 1 \leq k \leq n\right\}$.
+% \end{lemma}
+
+\begin{lemma}[Lagrange's inequality]\label{lem:lagrange}
+  Let $X$ be a complex manifold, $E$ be a Hermitian vector bundle over $X$ of rank $m$, and $\{\bullet, \bullet\}_E: \wedge^{p_1, q_1} T_X^* \otimes$ $E \times \wedge^{p_2, q_2} T_X^* \otimes E \longrightarrow \wedge^{p_1+q_2, q_1+p_2} T_X^*$ be the sesquilinear product which combines the wedge product $(u, v) \mapsto u \wedge \bar{v}$ on scalar valued forms with the Hermitian inner product on $E$. Then for any smooth section $s$ of $E$ over $X$ and any smooth section $w$ of $T_X^* \otimes E$ over $X$,
+\begin{equation}\label{eq:3.1}
+    \sqrt{-1}\{w, s\}_E \wedge\{s, w\}_E \leq|s|_E^2 \sqrt{-1}\{w, w\}_E .
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+  Since $\{\bullet, \bullet\}_E$ is a pointwise product, it's sufficient to prove \eqref{eq:3.1}  at every fixed point of $X$. Hence, we can regard $T_X^*$ and $E$ as vector spaces. Then $s$ and $w$ are regarded as elements in $E$ and $T_X^* \otimes E$ respectively. If $s=0$, \eqref{eq:3.1} is trivial. If $s \neq 0$, without loss of generality, we can assume that $|s|_E=1$. Then we choose $e_2, \cdots, e_m \in E$ such that $s, e_2, \cdots, e_m$ form an orthonormal basis of $E$. Now $w$ can be written as
+  $$
+  w_1 \otimes s+\sum_{j=2}^m w_j \otimes e_j,
+  $$
+  for some $w_j \in T_X^*(1 \leq j \leq m)$. Then we have
+  $$
+  \sqrt{-1}\{w, s\}_E \wedge\{s, w\}_E=\sqrt{-1} w_1 \wedge \bar{w}_1,
+  $$
+  and
+  $$
+  |s|_E^2 \sqrt{-1}\{w, w\}_E=\sqrt{-1} \sum_{j=1}^m w_j \wedge \bar{w}_j \geq \sqrt{-1} w_1 \wedge \bar{w}_1 .
+  $$
+  
+  Hence, \eqref{eq:3.1} holds. The lemma is, thus, proved.
+\end{proof}
+
+
+\section{Proof of the normal case theorem}
+In order to prove the main theorem, we should prove the following theorem firstly.
+\begin{theorem}[The case of $L^2$-extension]\label{thm:L2}
+  Let $(X, \omega)$ be a weakly pseudoconvex complex $n$ dimensional manifold possessing a Kähler metric $\omega, \psi$ be a plurisubharmonic function on $X$, $E$ be a holomorphic vector bundle of rank $m$ over $X$ equipped with a smooth Hermitian metric $(1 \leq m\leq n)$, and $s$ be a global holomorphic section of $E$. Assume that $s$ is transverse to the zero section, and let
+$$
+Y:=\{x \in X: s(x)=0, \bigwedge^m (\dd s)(x)\neq 0\} .
+$$
+
+Let $L$ be a holomorphic line bundle over $X$ equipped with a singular Hermitian metric $h_L$, which is written locally as $e^{-\varphi_L}$ for some function $\varphi_L \in L_{\text {loc }}^1$ with respect to a local holomorphic frame of $L$. Assume that $\frac{q}{2}\varphi_L+\br{1-\frac{q}{2}}\varphi_\omega+\psi$ is quasi-plurisubharmonic and $\varphi_L$ is locally bounded above.  Moreover, assume that the $(1,1)$-form  \vspace{.25em}
+
+{\upshape (i)}\vspace{.25em} $\frac{q}{2}\sqrt{-1} \Theta_L+\br{1-\frac{q}{2}}\sqrt{-1}\bd\bdd\varphi_\omega+ m\sqrt{-1} \partial \bar{\partial} \log |s|^2+\xu\bd\bdd \psi $\\$\geq 0$ holds on $X \backslash Y$, \newline
+and that there is a continuous function $\alpha>0$ on $X$ such that the following two inequalities hold on $X \backslash Y$ :
+
+{\upshape (ii)} $\frac{q}{2}\displaystyle\sqrt{-1} \Theta_L+\br{1-\frac{q}{2}}\sqrt{-1}\bd\bdd\varphi_\omega+m\sqrt{-1} \partial \bar{\partial} \log |s|^2+\xu\bd\bdd \psi \geq \frac{\left\{\sqrt{-1} \Theta_E s, s\right\}_E}{\alpha|s|_E^2}$,
+
+{\upshape (iii) }$\psi+m\log |s|^2\leq-2 m\alpha$ 
+
+\noindent Then, for every relatively compact open subset $\Omega \subset X$, and every $k$-jet $f \in H^0\left(X, K_X\otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}\right)$ satisfying
+$$
+C_f :=\int_Y \frac{|f|_{s, \rho,(k)}^2 e^{-\psi} }{\left|\bigwedge^m(d s)\right|^{2}_E }d V_{Y, \omega}<+\infty.
+$$
+
+Then there exists $F^{(k)} \in H^0\left(X, K_X \otimes L\right)$ such that $J^k F^{(k)}=f$ and
+$$
+\int_{\Omega} \frac{\left|F^{(k)}\right|_L^2}{e^{\psi+m\log |s|^2_E} R(\psi+m\log |s|^2_E)} d V_{X, \omega} \leq C_{m,R}^{(k)} C_f,
+$$
+where $C_{m,R}^{(k)}>0$ is a constant depending only on $m,R,k, E$, and $\sup _{\Omega}\|i \Theta_L\|$.
+
+\end{theorem}
+\begin{proof}
+Without loss of generality, we can suppose that $C_R=1$. Otherwise, we replace $R$ with $C_R R$ in the proof.
+
+If $f=0$ on $Y$, then $F=0$ satisfies the conclusion of Proposition 4.1. In the following proof, we assume that $f$ is not 0 identically.
+
+Since $X$ is pseudoconvex, there exists a smooth strictly plurisubharmonic exhaustion function $P$ on $X$. Instead of working on $X$ itself, we will work rather on the relatively compact subset $X_c \backslash Y$, where $X_c=\{P<c\}$ $\left(c=1,2, \cdots\right.$, we choose $P$ such that $\left.X_1 \neq \emptyset\right)$. By Lemma \ref{lem:3.5} $X_c \backslash Y$ $(c=1,2, \cdots)$ are complete Kähler.
+
+We will discuss for fixed $c$ until the end of the proof.
+
+% Since $X$ is Stein, by Cartan's Theorem B, there exists a holomorphic section $\tilde{f}$ on $X$ with values in $K_X \otimes L$ such that $\tilde{f}=f$ on $Y$.
+
+Let $\zeta:(-\infty, 0) \longrightarrow(0,+\infty)$ be a smooth strictly increasing function, and $\chi:(-\infty, 0) \longrightarrow(0,+\infty)$ a smooth strictly decreasing function. Assume that $\chi(t) \geq-\frac{t}{2}$ for $t \in(-\infty, 0)$. We will find more assumptions about $\zeta$ and $\chi$ in the proof, by which we will get explicit $\zeta$ and $\chi$ in the end of this section.
+
+Let $a \in(0,1)$ and put $\sigma_{\varepsilon}=m \log \left(|s|^2+\varepsilon^2\right)-a$ and $\sigma=m \log |s|^2-a$. Since $|s| \leq 1$ on $X$, there exists a positive number $\varepsilon_a \in(0,1)$ such that $\sigma_{\varepsilon} \leq-\frac{a}{2}$ on $\overline{X_c}$ for $\varepsilon \in\left(0, \varepsilon_a\right)$.
+
+% By Lemma 3.3, there exists a decreasing sequence of smooth plurisubharmonic functions $\left\{\varphi_j\right\}_{j=1}^{+\infty}$ on $X$ such that $\lim _{j \rightarrow+\infty} \varphi_j=\varphi$. 
+Assume that $K_X$ is naturally equipped with the smooth metric $e^{\varphi_\omega}$ with respect to the dual frame of $\dd z$. 
+% Let $L$ be the line bundle $L$ equipped with the new metric $e^{-\varphi_{L}}$, where $\varphi_{L}:=\frac{q}{2}\varphi_L+\left(1-\frac{q}{2}\right)\varphi_\omega+\psi$.  
+% Then the assumptions in the theorem imply that 
+% \begin{enumerate}[label=(\roman*)]
+%     \item $\xu \Theta_{L}+m\sqrt{-1} \partial \bar{\partial} \log |s|^2+\xu\bd\bdd \psi\geqslant 0$,
+%     \item $\xu \Theta_{L}+m\sqrt{-1} \partial \bar{\partial} \log |s|^2+\xu\bd\bdd \psi\geqslant \frac{\{\xu\Theta_{E}s,s\}_E}{\alpha\abs{s}^2_E}.$  
+% \end{enumerate}     
+Let $L_{a, \varepsilon}$  denote the line bundle $L$ on $X_c \backslash Y$ equipped with the new metric $h_{a, \varepsilon}:=e^{-\br{\frac{q}{2}\varphi_L+\left(1-\frac{q}{2}\right)\varphi_\omega+\psi}-\sigma-\zeta\left(\sigma_{\varepsilon}\right)}$.
+
+Set $\tau_{\varepsilon}=\chi\left(\sigma_{\varepsilon}\right)$ and let $A_{\varepsilon}$ be a smooth positive function on $\overline{X_c}$, which will be determined later. Set $\mathrm{B}_{\varepsilon}=\left[\Theta_{\varepsilon}, \Lambda\right]$ on $X_c \backslash Y$, where
+$$
+\Theta_{\varepsilon}:=\tau_{\varepsilon} \sqrt{-1} \Theta_{L_{a, \varepsilon}}-\sqrt{-1} \partial \bar{\partial} \tau_{\varepsilon}-\sqrt{-1} \frac{\partial \tau_{\varepsilon} \wedge \bar{\partial} \tau_{\varepsilon}}{A_{\varepsilon}} .
+$$
+
+Setting 
+\begin{equation}
+  \label{eq:3}
+  \nu_\varepsilon:=\frac{\{D's,s\}}{|s|^2+\varepsilon^2}.
+\end{equation}
+{\color{purple} We want to find suitable $\zeta, \chi$ and $A_{\varepsilon}$ such that
+\begin{equation}
+  \label{eq:expected}
+\left.\Theta_{\varepsilon}\right|_{X_c \backslash Y} \geq \frac{m \varepsilon^2}{|s|^2} \sqrt{-1} \nu_{\varepsilon} \wedge \bar{\nu}_{\varepsilon} .
+\end{equation}}
+
+Simple calculations yield
+ \begin{fullwidth}
+ \begin{equation}\label{eq:estimate}
+ \begin{aligned}
+ & \left.\Theta_{\varepsilon}\right|_{X_c \backslash Y} \\
+ = & \chi\left(\sigma_{\varepsilon}\right)\left(\frac{q}{2}\sqrt{-1} \partial \bar{\partial} \varphi_{L}+\left(1-\frac{q}{2}\right)\xu\bd\bdd\varphi_\omega+\xu\bd\bdd\psi+\sqrt{-1} \partial \bar{\partial} \sigma\right) \\
+ &+\left(\chi\left(\sigma_{\varepsilon}\right) \zeta^{\prime}\left(\sigma_{\varepsilon}\right)-\chi^{\prime}\left(\sigma_{\varepsilon}\right)\right) \sqrt{-1} \partial \bar{\partial} \sigma_{\varepsilon} +\left(\chi\left(\sigma_{\varepsilon}\right) \zeta^{\prime \prime}\left(\sigma_{\varepsilon}\right)-\chi^{\prime \prime}\left(\sigma_{\varepsilon}\right)-\frac{\left(\chi^{\prime}\left(\sigma_{\varepsilon}\right)\right)^2}{A_{\varepsilon}}\right) \sqrt{-1} \partial \sigma_{\varepsilon} \wedge \bar{\partial} \sigma_{\varepsilon} \\
+ = & \chi\br{\sigma_\varepsilon}\left(\frac{q}{2}\sqrt{-1} \partial \bar{\partial} \varphi_{L}+\left(1-\frac{q}{2}\right)\xu\bd\bdd\varphi_\omega+\xu\bd\bdd\psi+m\sqrt{-1} \partial \bar{\partial} \log |s|^2\right)\\
+ & +\left(\chi\left(\sigma_{\varepsilon}\right) \zeta^{\prime}\left(\sigma_{\varepsilon}\right)-\chi^{\prime}\left(\sigma_{\varepsilon}\right)\right) \sqrt{-1} \partial \bar{\partial} \sigma_{\varepsilon} +\left(\chi\left(\sigma_{\varepsilon}\right) \zeta^{\prime \prime}\left(\sigma_{\varepsilon}\right)-\chi^{\prime \prime}\left(\sigma_{\varepsilon}\right)-\frac{\left(\chi^{\prime}\left(\sigma_{\varepsilon}\right)\right)^2}{A_{\varepsilon}}\right) \sqrt{-1} \partial \sigma_{\varepsilon} \wedge \bar{\partial} \sigma_{\varepsilon} .
+ \end{aligned}
+ \end{equation}
+\end{fullwidth}
+
+{\color{dblue} Assume that the equalities
+\begin{equation}\label{eq:5}
+  \chi\left(\sigma_{\varepsilon}\right) \zeta^{\prime}\left(\sigma_{\varepsilon}\right)-\chi^{\prime}\left(\sigma_{\varepsilon}\right)=1
+\end{equation}
+and
+\begin{equation}\label{eq:6}
+  \chi\left(\sigma_{\varepsilon}\right) \zeta^{\prime \prime}\left(\sigma_{\varepsilon}\right)-\chi^{\prime \prime}\left(\sigma_{\varepsilon}\right)-\frac{\left(\chi^{\prime}\left(\sigma_{\varepsilon}\right)\right)^2}{A_{\varepsilon}}=0
+\end{equation}}
+hold, we obtain that
+\begin{equation}\label{eq:1.3}
+  \left.\Theta_{\varepsilon}\right|_{X_c \backslash Y} \geq \chi\br{\sigma_\varepsilon}\left(\frac{q}{2}\sqrt{-1} \partial \bar{\partial} \varphi_{L}+\left(1-\frac{q}{2}\right)\xu\bd\bdd\varphi_\omega+\xu\bd\bdd\psi+m\sqrt{-1} \partial \bar{\partial} \log |s|^2\right)+{\color{purple} \sqrt{-1} \partial \bar{\partial} \sigma_{\varepsilon} }.
+\end{equation}\sidenote{We will provide the estimate for the last term.}
+
+Furthermore, by \eqref{eq:5} we can {\color{purple} assume that $A_{\varepsilon}=\eta\left(\sigma_{\varepsilon}\right)$} for some smooth function $\eta:(-\infty, 0) \longrightarrow(0,+\infty)$ such that\sidenote{Here \eqref{eq:8} is equivalent to the above \eqref{eq:6}.}
+{\color{dblue} \begin{equation}\label{eq:8}
+  \chi \zeta^{\prime \prime}-\chi^{\prime \prime}-\frac{\left(\chi^{\prime}\right)^2}{\eta}=0
+\end{equation}}
+
+Since it follows from Lemma \ref{lem:lagrange} that
+$$
+|s|^2 \sqrt{-1} \sum_{i=1}^m d s^i \wedge d \bar{s}^i \geq \sqrt{-1}\left(\sum_{i=1}^m \bar{s}^i d s^i\right) \wedge\left(\sum_{i=1}^m s^i d \bar{s}^i\right)
+$$
+, which can be stated as
+\[
+  |s|^2 \sqrt{-1} \{D's ,D's\} \geq \sqrt{-1} \{D's,s\}\wedge \{s,D's\}.
+\]
+We obtain that on $X_c\backslash Y$,
+\begin{align*}
+ {\color{purple}  \xu\bd\bdd\sigma_\varepsilon} &= \frac{m\xu \{D's ,D's\} }{\abs{s}^2+\varepsilon^2}-\frac{m \sqrt{-1} \{D's,s\}\wedge \{s,D's\} }{(\abs{s}^2+\varepsilon^2)^2}-\frac{m\xu \{\Theta_E s,s\}}{\abs{s}^2+\varepsilon^2}\\ 
+  &\geqslant \frac{m \varepsilon^2}{|s|^2}\frac{\sqrt{-1} \{D's,s\}\wedge \{s,D's\} }{(\abs{s}^2+\varepsilon^2)^2}-\frac{m\xu \{\Theta_E s,s\}}{\abs{s}^2+\varepsilon^2}\\ 
+  &=\frac{m \varepsilon^2}{|s|^2}\xu \nu_\varepsilon\wedge \bar\nu_{\varepsilon}-\frac{m\xu \{\Theta_E s,s\}}{\abs{s}^2+\varepsilon^2}.
+\end{align*} 
+
+Then it follows from \eqref{eq:1.3} that on $X_c\backslash Y$, 
+\[
+\begin{aligned}
+    \Theta_\varepsilon \geqslant &\br{\chi(\sigma_\varepsilon) \left(\frac{q}{2}\sqrt{-1} \partial \bar{\partial} \varphi_{L}+\left(1-\frac{q}{2}\right)\xu\bd\bdd\varphi_\omega+\xu\bd\bdd\psi+m\sqrt{-1} \partial \bar{\partial} \log |s|^2\right)
+    -\frac{m\xu \{\Theta_E s,s\}}{\abs{s}^2+\varepsilon^2}}\\
+    +&\frac{m \varepsilon^2}{|s|^2}\xu \nu_\varepsilon\wedge \bar\nu_{\varepsilon}.
+\end{aligned}
+\] 
+
+Since $\chi (\sigma_\varepsilon)\geq m\alpha$ by the assumption $\chi(t)\geq -\frac{t}{2}$  , it follows from the condition on $X\backslash Y$ in Theorem \ref{thm:main}  that 
+\begin{align*}
+  &\chi (\sigma_\varepsilon) (\frac{q}{2}\sqrt{-1} \partial \bar{\partial} \varphi_{L}+\left(1-\frac{q}{2}\right)\xu\bd\bdd\varphi_\omega+\xu\bd\bdd\psi+m\xu\bd\bdd \log |s|^2)-\frac{m\xu \{\Theta_E s,s\}}{\abs{s}^2+\varepsilon^2}\\ 
+& =\chi (\sigma_\varepsilon) (\frac{q}{2}\sqrt{-1} \partial \bar{\partial} \varphi_{L}+\left(1-\frac{q}{2}\right)\xu\bd\bdd\varphi_\omega+\xu\bd\bdd\psi+m\xu\bd\bdd \log |s|^2)-\frac{m\alpha\abs{s}^2 }{\abs{s}^2+\varepsilon^2}\frac{\xu \{\Theta_E s,s\}}{\alpha \abs{s}^2}\\ 
+&\geq \frac{m\alpha\abs{s}^2 }{\abs{s}^2+\varepsilon^2} \br{\frac{q}{2}\sqrt{-1} \partial \bar{\partial} \varphi_{L}+\left(1-\frac{q}{2}\right)\xu\bd\bdd\varphi_\omega+\xu\bd\bdd\psi+\xu\bd\bdd \sigma-\frac{\xu \{\Theta_E s,s\}}{\alpha \abs{s}^2}}\\ 
+&\geq 0 \quad \text{(By the assumption (ii) in Theorem \ref{thm:main}.)}
+\end{align*}
+on $X_c\backslash Y$ . Hence, one obtain \eqref{eq:expected} as expected.
+
+{\color{purple} As a result, we have 
+\begin{equation}\label{eq:9}
+  B_\varepsilon\geq \left[\frac{m\varepsilon^2}{\abs{s}^2}\xu\nu_\varepsilon\wedge\bar\nu_\varepsilon,\Lambda\right]=\frac{m\varepsilon^2}{\abs{s}^2}T_{\bar\nu_\varepsilon}T_{\bar\nu_\varepsilon}^*
+\end{equation}}
+on $X_c\backslash Y$ as an operator on $(n,1)$ forms, where $T_{\bar\nu_\varepsilon}$  denotes the operator $\bar\nu_\varepsilon\wedge\bullet$ and $T_{\bar\nu_\varepsilon}^*$ is its Hilbert adjoint operator.
+
+\subsection{Solving \texorpdfstring{$\bar{\partial}$}{}-equation on \texorpdfstring{$X_c$}{} with estimates.}
+
+With such preparation, we now argue by {\color{purple} induction on $k \geq 0$}. The case $k=0$ is a special case of \cite[Theorem 1.2]{ZZ18}. Now, {\color{purple} assume that the theorem has been proved for $k-1$}, and we consider the short exact sequence of sheaves
+$$
+0 \longrightarrow S^k N_{Y / X}^* \longrightarrow \mathcal{O}_X / \mathcal{J}_Y^{k+1} \longrightarrow \mathcal{O}_X / \mathcal{J}_Y^k \longrightarrow 0
+$$
+
+Let $J^{k-1} f \in H^0\left(X, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^k\right)$ be the image of $f \in H^0\left(X, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}\right)$ under the induced cohomology group morphism. By {\color{purple} the induction hypothesis}\sidenote{By theorem \ref{thm:L2}, there exists $F^{(k-1)} \in H^0\left(X, K_X \otimes L\right)$ such that $J^{k-1} F^{(k-1)}=J^{k-1}f$ and
+{\footnotesize $$
+ \begin{aligned}
+ &\int_{\Omega} \frac{\left|F^{(k-1)}\right|_L^2}{e^{\psi+m\log |s|^2_E} R(\psi+m\log |s|^2_E)} d V_{X, \omega} \\
+ &\leq C_{m,R}^{(k-1)} C_f,
+\end{aligned}
+$$}
+where $C_{m,R}^{(k-1)}>0$ is a constant depending only on $m,R,k, E$, and $\sup _{\Omega}\|i \Theta_L\|$.}, {\color{dblue} there exists $F^{(k-1)} \in$ $H^0\left(X, \right.$ $\left. K_X \otimes L\right)$ such that
+{\small\begin{equation}\label{eq:10}
+ \begin{gathered}
+    J^{k-1} F^{(k-1)}=J^{k-1} f, \\\int_{X_c} \frac{\left|F^{(k-1)}\right|_L^2}{|s|^{2 m} R\left(\psi+m \log |s|_E^2\right)} e^{-\psi}\mathrm{d} V_{X, \omega} \leq C_{m, R}^{(k-1)} \int_{Y_c} \frac{|f|_{s, \rho,(k-1)}^2 e^{-\psi}}{\left|\Lambda^m(\mathrm{~d} s)\right|^2} \mathrm{~d} V_{Y, \omega},
+\end{gathered}
+\end{equation}}
+where $C_{m, R}^{(k-1)}>0$ is a constant as in the statement of Theorem \ref{thm:L2} and $Y_c:=Y \cap X_c$.} Thus, the image $$J^{k-1} f-J^{k-1} F^{(k-1)} \in H^0\left(X, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^k\right)$$ of $f-J^k F^{(k-1)} \in H^0\left(X, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}\right)$ vanishes. So we can view the jet $f-J^k F^{(k-1)}$ as a global holomorphic section (on $Y$ ) of the sheaf $K_X \otimes L \otimes S^k N_{Y / X}^*=K_X \otimes L \otimes S^k E_{\mid Y}^*$\sidenote{The explanation:
+
+ \textbf{1. Short Exact Sequence and Structure:}
+The given short exact sequence  
+\[
+ \begin{aligned}
+ &0 \longrightarrow S^k N_{Y/X}^* \longrightarrow \mathcal{O}_X / \mathcal{J}_Y^{k+1} \\
+ &\longrightarrow \mathcal{O}_X / \mathcal{J}_Y^k \longrightarrow 0
+\end{aligned}
+\]
+shows that the difference between the sheaves \( \mathcal{O}_X / \mathcal{J}_Y^{k+1} \) and \( \mathcal{O}_X / \mathcal{J}_Y^k \) lies in sections of \( S^k N_{Y/X}^* \). 
+
+ \textbf{2. Constructing the Section:}
+Given \( f \in H^0(X, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}) \), its image under the induced map is \( J^{k-1} f \) in \( H^0(X, K_X \otimes L \otimes \mathcal{O}_X / \mathcal{J}_Y^k) \). By the induction hypothesis, we find \( F^{(k-1)} \in H^0(X, K_X \otimes L) \) such that \( J^{k-1} F^{(k-1)} = J^{k-1} f \). 
+
+Now consider \( f - J^k F^{(k-1)} \). This difference has a vanishing \((k-1)\)-th jet, i.e., it lies in the kernel of the projection to \( \mathcal{O}_X / \mathcal{J}_Y^k \). Therefore, it can be viewed as a section of \( S^k N_{Y/X}^* \) via the injection in the short exact sequence.
+
+ \textbf{3. Identifying the Sheaf:}
+Since \( N_{Y/X} \) is the normal bundle, its symmetric power \( S^k N_{Y/X}^* \) describes jets of order \( k \). Moreover, as \( N_{Y/X} \cong E_{\mid Y} \), we identify \( S^k N_{Y/X}^* \) with \( S^k E_{\mid Y}^* \). Thus, \( f - J^k F^{(k-1)} \) becomes a holomorphic section of the sheaf \( K_X \otimes L \otimes S^k E_{\mid Y}^* \).
+
+ \textbf{Conclusion:}
+The structure of the exact sequence allows us to interpret the jet \( f - J^k F^{(k-1)} \) as a section of \( K_X \otimes L \otimes S^k N_{Y/X}^* = K_X \otimes L \otimes S^k E_{\mid Y}^* \).}.
+
+Using the results in \cite[p12]{Popovici2004L2EF}, one can construct an extension $\tilde{f} \in C^{\infty}\left(X, K_X \otimes L\right)$ of the holomorphic $k$-jet $f \in H^0\left(X, K_X \otimes L\right.$\\ $\left. \otimes \mathcal{O}_X / \mathcal{J}_Y^{k+1}\right)$ by means of a partition of unity, satisfying
+$$
+\bar{\partial} \tilde{f}=0 \quad \text { on } Y ,
+$$
+and
+$$
+|\bar{\partial} \tilde{f}|=O\left(|s|^{k+1}\right) \quad \text { in a neighbourhood of } Y .
+$$
+% ------------------------------- Clear sidenotes ------------------------------ %
+% \softclearmargin
+% ---------------------------------------------------------------------------- %
+{\color{purple} Set\sidenote{Since we hardly know
+$\tilde{f}$ away from $Y$ , we take a truncation with support in a tubular neighbourhood of $Y$.}
+$$
+G_{\varepsilon}^{(k-1)}:=\theta\left(\frac{\varepsilon^2}{|s|^2+\varepsilon^2}\right)\left(\tilde{f}-F^{(k-1)}\right) \in C^{\infty}\left(X, K_X \otimes L\right),
+$$}
+where $0<\varepsilon<\varepsilon_a$, and $\theta: \mathbb{R} \rightarrow[0,1]$ is a $C^{\infty}$ function such that $\theta \equiv 0$ on $(-\infty, \frac{l}{2}]$; $\theta \equiv 1$ on $\left[1-\frac{l}{2},+\infty\right)$, and $\left|\theta^{\prime}\right| \leq \frac{1+l}{1-l}$ on $\mathbb{R}$. {\color{purple} Then it suffices to solve the equation\sidenote{Here $u_\varepsilon$ is used to construct the erro term between $F^{(k)}$ and $F^{(k-1)}$. Later, we will see that it is the key to end the proof.}
+\begin{equation}\label{eq:target}
+  \bar{\partial} u_{\varepsilon}=\bar{\partial} G_{\varepsilon}^{(k-1)},
+\end{equation}
+with the extra condition $\frac{\left|u_{\varepsilon}\right|^2}{ |s|^{2m}} \in L_{\text {loc }}^1$ in a neighbourhood of $Y$. This condition guarantees that $u_{\varepsilon}$, as well as all its jets of orders $\leq k$, vanishes on $Y$.}
+By direct calculations, one has
+$$
+\bar{\partial} G_{\varepsilon}^{(k-1)}=g_{\varepsilon}^{(1)}+g_{\varepsilon}^{(2)},
+$$
+where
+$$
+\begin{aligned}
+& g_{\varepsilon}^{(1)}=-\frac{\varepsilon^2}{|s|^2+\varepsilon^2} \cdot \theta^{\prime}\left(\frac{\varepsilon^2}{|s|^2+\varepsilon^2}\right) \bar{v}_{\varepsilon} \wedge\left(\tilde{f}-F^{(k-1)}\right), \\
+& g_{\varepsilon}^{(2)}=\theta\left(\frac{\varepsilon^2}{|s|^2+\varepsilon^2}\right) \bar{\partial}\left(\tilde{f}-F^{(k-1)}\right) .
+\end{aligned}
+$$
+Recall that $v_{\varepsilon}$ is given in \eqref{eq:3}.
+
+
+In this situation, $g_{\varepsilon}^{(2)}$ turns out to have no contribution in the limit since it converges uniformly to 0 on every compact set when $\varepsilon$ tends to 0 . Actually, Supp $\left(g_{\varepsilon}^{(2)}\right) \subset\{|s|<\sqrt{2} \varepsilon\}$ and $\left|g_{\varepsilon}^{(2)}\right|=O\left(|s|^{k+1}\right)$ because of $|\bar{\partial} \widetilde{f}|=O\left(|s|^{k+1}\right)$ in a neighbourhood of $Y$ as we have previously shown.
+
+
+Then
+$$
+\int_{X_c \backslash Y}\left\langle B_{\varepsilon}^{-1} g_{\varepsilon}^{(2)}, g_{\varepsilon}^{(2)}\right\rangle_L|s|^{-2m} e^{-\psi}\mathrm{d} V_{X, \omega}=O(\varepsilon),
+$$
+provided that $B_{\varepsilon}$ is locally uniformly bounded below in a neighbourhood of $Y$. Otherwise, we shall solve the approximate equation $\bar{\partial} u+\sqrt{\delta} h=g_{\varepsilon}$ with $\delta>0$ small (see Lemma \ref{lem:L2existence} and \cite[Remark 3.2]{Demailly2000} for more details). One can remove the extra error term $\sqrt{\delta} h$ by putting $\delta \rightarrow 0$ at the end. Since there is no essential difficulty during this procedure, for the purpose of simplicity, we will assume to have the desired lower bound for $B_{\varepsilon}$ and the estimate of $g_{\varepsilon}^{(2)}$ as above.
+
+Next, we turn to estimate the term involving $g_{\varepsilon}^{(1)}$ on $X_c \backslash Y$. By \eqref{eq:9},
+{\color{purple} $$
+\left\langle B_{\varepsilon}^{-1} g_{\varepsilon}^{(1)}, g_{\varepsilon}^{(1)}\right\rangle_{L_{a, \varepsilon}} \leq \frac{|s|^2}{m \varepsilon^2} \cdot\left|\theta^{\prime}\left(\frac{\varepsilon^2}{|s|^2+\varepsilon^2}\right) \frac{\varepsilon^2}{|s|^2+\varepsilon^2}\left(\tilde{f}-F^{(k-1)}\right)\right|_{L_{a, \varepsilon}}^2 .
+$$}
+
+In \cite[p17]{Popovici2004L2EF}, Popovici showed that on every compact set, 
+\[
+\frac{\left|\left(\tilde{f}-F^{(k-1)}\right)\left(\varepsilon s, z^{\prime}\right)\right|_L ^2}{\varepsilon^{2 k}} \longrightarrow  \left|\nabla^k\left(f-J^k F^{(k-1)}\right)\left(z^{\prime}\right)\right|_L^2 ,\quad (\varepsilon\to 0).
+\]
+Then using a partition of unity $\{\xi_p\}_{p=1}^{p_0}$  around $\overline{X_c} \backslash Y$ and the Fubini theorem, we obtain
+\begin{fulleq}
+ \begin{align*}
+      \int_{X_c \backslash Y}\left\langle\mathrm{~B}_{\varepsilon}^{-1} g_{\varepsilon}^{(1)}, g_{\varepsilon}^{(1)}\right\rangle_{L_{a, \varepsilon}} e^{-\psi}\dd V_X 
+     & \leq \frac{e^a(1+l)^2}{m(1-l)^2} \sum_{p=1}^{p_0} \int_{X_c \cap\left\{\sqrt{\frac{l}{2-l}} \varepsilon<|s|<\sqrt{\frac{2-l}{l}} \varepsilon\right\}} \frac{\varepsilon^2 \xi_p |\tilde{f}-F^{(k-1)} |^2_{L} e^{-\psi}\dd V_X}{\left(|s|^2+\varepsilon^2\right)^2|s|^{2 m-2}} \\
+     & \leq \sum_{p=1}^{p_0}\left(\int_{\left\{z \in \mathbb{C}^m: \sqrt{\frac{l}{2-l}} \varepsilon<|z|<\sqrt{\frac{2-l}{l}} \varepsilon\right\}} \frac{\varepsilon^2(\sqrt{-1})^{m^2} \bigwedge^m(d z) \wedge \bigwedge^m(d \bar{z})}{\left(|z|^2+\varepsilon^2\right)^2|z|^{2 m-2}}\right. \\
+     & \left.\times \frac{e^a(1+l)^2}{m(1-l)^2} \int_{Y_c} \frac{\xi_p \left|\nabla^k \left(\tilde{f}-J^k F^{(k-1)}\right)\right| ^2_{L} }{\left|\wedge^m(d s)\right|^2} e^{-\psi}\dd V_{Y,\omega}\right) \\
+ &\rightarrow \frac{e^a(1+l)^2}{m(1-l)^2} C_{m,k}\int_{Y_c} \frac{ \left|\nabla^k \left(f-J^k F^{(k-1)}\right) \right|^2_{L} }{\left|\wedge^m(d s)\right|^2} e^{-\psi}\dd V_{Y,\omega}\quad (\varepsilon\to 0),
+ \end{align*}
+\end{fulleq}
+where 
+\begin{equation*}
+  C_{m,k}:=\int_{\left\{z \in \mathbb{C}^m: \sqrt{\frac{l}{2-l}} <|z|<\sqrt{\frac{2-l}{l}} \varepsilon\right\}} \frac{(\sqrt{-1})^{m^2} \bigwedge^m(d z) \wedge \bigwedge^m(d \bar{z})}{\left(|z|^2+1\right)^2|z|^{2 m-2}},
+\end{equation*}
+% $$
+% \begin{aligned}
+% & \int_{X_c \backslash Y}\left\langle B_{\varepsilon}^{-1} g_{\varepsilon}^{(1)}, g_{\varepsilon}^{(1)}\right\rangle_{L_{a, \varepsilon}} \mathrm{d} V_X \leq \frac{16 e^a}{m} \int_{X_c \cap\left\{\sqrt{\frac{1}{2}} \varepsilon<|s|<\sqrt{2} \varepsilon\right\}} \frac{\varepsilon^2\left|\tilde{f}-F^{(k-1)}\right|_L^2 \mathrm{~d} V_X}{\left(|s|^2+\varepsilon^2\right)^2|s|^{2(m+k-1)}} \\
+% & \longrightarrow \frac{16 e^a}{m} C_{m, k} \int_{Y_c} \frac{\left|\nabla^k\left(f-J^k F^{(k-1)}\right)\right|_L^2}{\left|\Lambda^m(\mathrm{~d} s)\right|^{2 \frac{m+k}{m}}} \mathrm{~d} V_{Y, \omega} \quad(\varepsilon \longrightarrow 0),
+% \end{aligned}
+% $$
+which depends only on $m$ and $k$. It may be worthwhile to note that $$\left|\nabla^k\left(f-J^k F^{(k-1)}\right)\right|_L=\left|f-J^k F^{(k-1)}\right|_L,$$ where $f-J^k F^{(k-1)} \in H^0\left(Y, K_X \otimes L \otimes S^k N_{Y / X}^*\right)$. Then, one has
+ \begin{fullwidth}
+ $$
+ \int_{X_c \backslash Y}\left\langle B_{\varepsilon}^{-1} g_{\varepsilon}^{(1)}, g_{\varepsilon}^{(1)}\right\rangle_{L_{a, \varepsilon}} e^{-\psi}\mathrm{d} V_X \leq \frac{e^a(1+l)^2}{m(1-l)^2} C_{m, k} \int_{Y_c} \frac{\left|\nabla^k\left(f-J^k F^{(k-1)}\right)\right|_{L}^2}{\left|\Lambda^m(\mathrm{~d} s)\right|^{2 }} e^{-\psi}\mathrm{~d} V_{Y, \omega},
+ $$
+\end{fullwidth}
+when $\varepsilon$ is small enough. By using Lemma \ref{lem:L2existence}\sidenote[][0pt]{$L^2$ existence theorem with erro term $\delta=0$.} with $\delta=0$, we can solve \eqref{eq:target}, i.e., there exists $u_{c, a, \varepsilon} \in L^2\left(X_c \backslash Y, K_X \otimes L_{a, \varepsilon}\right)$ such that
+$$
+\bar{\partial} u_{c, a, \varepsilon}=\bar{\partial} G_{\varepsilon}^{(k-1)}=g_{\varepsilon}^{(1)}+g_{\varepsilon}^{(2)}
+$$
+on $X_c \backslash Y$ and
+
+ \begin{fullwidth}
+ \begin{equation}\label{eq:12}
+   \int_{X_c \backslash Y} \frac{\left|u_{c, a, \varepsilon}\right|_{L}^2 e^{-\sigma-\zeta\left(\sigma_{\varepsilon}\right)}}{\tau_{\varepsilon}+A_{\varepsilon}} e^{-\psi}\mathrm{d} V_X \leq \frac{e^a(1+l)^2}{m(1-l)^2} C_{m, k} \int_{Y_c} \frac{\left|\nabla^k\left(f-J^k F^{(k-1)}\right)\right|_{L}^2}{\left|\Lambda^m(\mathrm{~d} s)\right|^{2 }} e^{-\psi}\mathrm{~d} V_{Y, \omega}+O(\varepsilon) .
+ \end{equation}
+\end{fullwidth}
+
+
+Since $\sigma, \zeta\left(\sigma_{\varepsilon}\right), \tau_{\varepsilon}+A_{\varepsilon}$ are all bounded above on $\overline{X_c}$ for each fixed $\varepsilon$, the inequality \eqref{eq:12} implies that $u_{c, a, \varepsilon} \in L^2\left(X_c, K_X \otimes L\right)$. As \eqref{eq:target}, \eqref{eq:12} and $G_{\varepsilon}^{k-1}$ is smooth, Lemma \ref{lem:6}\sidenote[][-50pt]{\begin{minipage}{\marginparwidth}
+ \begin{lemma}[Lemma 6.9 in \cite{Demailly1982}]
+   Let $\Omega$ be an open subset of $\mathbb{C}^n$ and $Z$ be a complex analytic subset of $\Omega$. Assume that $v$ is a $(p, q-1)$-form with $L_{\text {loc }}^2$ coefficients and $h$ is a $(p, q)$-form with $L_{\textrm{loc}}^1$ coefficients such that $\bar{\partial} v=h$ on $\Omega \backslash Z$ (in the sense of distribution theory). Then $\bar{\partial} v=h$ on $\Omega$.
+ \end{lemma}
+\end{minipage}} gives that
+\begin{equation}\label{eq:13}
+  \bar{\partial} u_{c, a, \varepsilon}=\bar{\partial} G_{\varepsilon}^{(k-1)}=g_{\varepsilon}^{(1)}+g_{\varepsilon}^{(2)}
+\end{equation}
+extends across $Y$ and
+ \begin{fulleq}
+ \begin{equation}\label{eq:14}
+   \int_{X_c} \frac{\left|u_{c, a, \varepsilon}\right|_{L}^2 e^{-\sigma-\zeta\left(\sigma_{\varepsilon}\right)}}{\tau_{\varepsilon}+A_{\varepsilon}} e^{-\psi}\mathrm{d} V_X \leq \frac{e^a(1+l)^2}{m(1-l)^2}C_{m, k} \int_{Y_c} \frac{\left|\nabla^k\left(f-J^k F^{(k-1)}\right)\right|_{L}^2}{\left|\Lambda^m(\mathrm{~d} s)\right|^{2 }} e^{-\psi}\mathrm{~d} V_{Y, \omega}+O(\varepsilon) .
+ \end{equation}
+\end{fulleq}
+
+{\color{purple} The $k$-jet extension\sidenote{\small Here is the key point of the proof. The $k$-th term is represented by the $k-1$ term, which is also the core step of the induction. In above we set \[G_{\varepsilon}^{(k-1)}:=\theta\left(\frac{\varepsilon^2}{|s|^2+\varepsilon^2}\right)\left(\tilde{f}-F^{(k-1)}\right) ,\]
+and we have known that \[
+ \begin{aligned}
+ \bdd u_\varepsilon&=\bdd G_\varepsilon^{(k-1)}\sim g_\varepsilon^{(1)}\\
+ &=-\frac{\varepsilon^2}{|s|^2+\varepsilon^2} \cdot \theta^{\prime}\left(\frac{\varepsilon^2}{|s|^2+\varepsilon^2}\right) \bar{v}_{\varepsilon} \\
+ &\wedge\left(\tilde{f}-F^{(k-1)}\right).
+\end{aligned}
+\]
+% Thus by \ref{lem:L2existence} there exists a solution $u_{c,a,\varepsilon}$ satisfying \ref{eq:13} and \ref{eq:14}, and 
+} of $f$ to $X_c$ is then given by
+$$
+F_{c, a, \varepsilon}^{(k)}:=\br{G_{\varepsilon}^{(k-1)}-u_{c, a, \varepsilon}}+F^{(k-1)} .
+$$}
+
+Then $F_{c, a, \varepsilon}^{(k)}$ is holomorphic on $X_c$, thanks to \eqref{eq:13}, $F^{(k-1)} \in H^0\left(X, K_X \otimes L\right)$ as well as the ellipticity of the operator $\bar{\partial}$ in bidegree $(n, 0)$. So $u_{c, a, \varepsilon}$ is also smooth on $X_c$. Locally, near an arbitrary point of $Y$, all partial derivatives of order $s\leq k$ of $F_{c, a, \varepsilon}^{(k)}$ are prescribed by $f$.
+
+
+By the variant of Cauchy-Schwarz inequality, we have
+ \begin{equation}\label{eq:15}
+   \begin{aligned}
+   &\left\langle\kappa_1+\kappa_2+\kappa_3, \kappa_1+\kappa_2+\kappa_3\right\rangle \\
+   & \leq (1+l)\left\langle\kappa_1+\kappa_2, \kappa_1+\kappa_2\right\rangle+(1+\frac{1}{l})\left\langle\kappa_3, \kappa_3\right\rangle \\
+   & \leq (1+l)^2 \left\langle\kappa_1, \kappa_1\right\rangle+\frac{(1+l)^2}{l}\left\langle\kappa_2, \kappa_2\right\rangle+(1+\frac{1}{l})\left\langle\kappa_3, \kappa_3\right\rangle
+   \end{aligned}
+ \end{equation}
+for any inner product space $(\mathcal{H},\langle\cdot, \cdot\rangle), \kappa_1, \kappa_2, \kappa_3 \in \mathcal{H}$.
+
+Then for some sufficiently small $\varepsilon, R\left(\sigma_{\varepsilon}\right) \leq R(\sigma), R\left(m \log |s|^2\right) \leq R(\sigma)$, the induction hypothesis \eqref{eq:10}, \eqref{eq:14} and \eqref{eq:15} give the estimate on the relatively compact open subset $X_c$,
+\clearpage
+   \begin{fullwidth}
+   \begin{align}\label{eq:16}
+   & \int_{X_c} \frac{\left|F_{c, a, \varepsilon}^{(k)}\right|_{L}^2}{e^{\sigma} R(\sigma)} e^{-\psi}\mathrm{d} V_X  \notag\\
+   & \leq (1+l)^2 \int_{X_c} \frac{\left|u_{c, a, \varepsilon}\right|_{L}^2}{e^{\sigma} R(\sigma)} e^{-\psi}\mathrm{d} V_X+\frac{(1+l)^2}{l} \int_{X_c} \frac{\left|F^{(k-1)}\right|_{L}^2}{e^{\sigma} R(\sigma)} e^{-\psi}\mathrm{d} V_X+(1+\frac{1}{l}) \int_{X_c} \frac{\left|G_{\varepsilon}^{(k-1)}\right|_{L}^2}{e^{\sigma} R(\sigma)} e^{-\psi}\mathrm{d} V_X  \notag\\
+   & \leq (1+l)^2\left(\sup _{X_c} \frac{\left(\tau_{\varepsilon}+A_{\varepsilon}\right) e^{\zeta\left(\sigma_{\varepsilon}\right)}}{R\left(\sigma_{\varepsilon}\right)}\right) \int_{X_c} \frac{\left|u_{c, a, \varepsilon}\right|_{L}^2 e^{-\sigma-\zeta\left(\sigma_{\varepsilon}\right)}}{\tau_{\varepsilon}+A_{\varepsilon}} e^{-\psi}\mathrm{d} V_X  \notag\\
+   & +\frac{(1+l)^2}{l}  e^{ a} \int_{X_c} \frac{\left|F^{(k-1)}\right|_{L}^2}{|s|^{2 m} R\left(m \log |s|^2\right)} e^{-\psi}\mathrm{d} V_X+(1+\frac{1}{l}) e^{a} \int_{X_c} \frac{\theta\left(\frac{\varepsilon^2}{|s|^2+\varepsilon^2}\right)^2\left|\tilde{f}-F^{(k-1)}\right|_{L}^2}{|s|^{2 m} R\left(m \log |s|^2\right)} e^{-\psi}\mathrm{d} V_X  \notag\\
+   & \leq (1+l)^2 \left(\sup _{X_c} \frac{\left(\tau_{\varepsilon}+A_{\varepsilon}\right) e^{\zeta\left(\sigma_{\varepsilon}\right)}}{R\left(\sigma_{\varepsilon}\right)}\right) \int_{X_c} \frac{\left|u_{c, a, \varepsilon}\right|_{L}^2 e^{-\sigma-\zeta\left(\sigma_{\varepsilon}\right)}}{\tau_{\varepsilon}+A_{\varepsilon}} e^{-\psi}\mathrm{d} V_X  \notag\\
+   & +\frac{(1+l)^2}{l}  e^{a} \int_{X_c} \frac{\left|F^{(k-1)}\right|_{L}^2}{|s|^{2 m} R\left(m \log |s|^2\right)} e^{-\psi}\mathrm{d} V_X+(1+\frac{1}{l}) C_1 e^{a} \int_{X_c} \frac{1}{|s|^{2 m} R\left(m \log |s|^2\right)} e^{-\psi}\mathrm{d} V_X  \notag\\
+   & \leq \frac{(1+l)^4 e^a}{m (1-l)^2}\left(\sup _{X_c} \frac{\left(\tau_{\varepsilon}+A_{\varepsilon}\right) e^{\zeta\left(\sigma_{\varepsilon}\right)}}{R\left(\sigma_{\varepsilon}\right)}\right) C_{m, k} \int_{Y_c} \frac{\left|\nabla^k\left(f-J^k F^{(k-1)}\right)\right|_{L}^2}{\left|\bigwedge^m(\mathrm{~d} s)\right|^{2 }} e^{-\psi}\mathrm{~d} V_Y  \notag\\
+   & +\frac{(1+l)^2}{l}  e^{a} C_{m, R}^{(k-1)} \int_{Y_c} \frac{|f|_{s, \rho,(k-1)}^2}{\left|\bigwedge^m(\mathrm{~d} s)\right|^2} e^{-\psi}\mathrm{~d} V_Y+C_2 \int_{-\infty}^{2 m \log \varepsilon+C_3} \frac{1}{R(t)} \mathrm{d} t+O(\varepsilon)  \notag\\
+   & \leq e^{a} C_{m, R}^{\prime(k)} \int_{Y_c} \frac{|f|_{s, \rho,(k)}^2}{\left|\Lambda^m(\mathrm{~d} s)\right|^2} e^{-\psi}\mathrm{~d} V_Y  +\frac{(1+l)^4 e^a}{m (1-l)^2} C_{m, k} \int_{Y_c} \frac{\left|\nabla^k\left(J^k F^{(k-1)}\right)\right|_{L}^2}{\left|\bigwedge^m(\mathrm{~d} s)\right|^{2 }} e^{-\psi}\mathrm{~d} V_Y \notag\\
+   &+C_2 \int_{-\infty}^{2 m \log \varepsilon+C_3} \frac{1}{R(t)} \mathrm{d} t+O(\varepsilon), 
+   \end{align}
+  \end{fullwidth}
+where $C_{m, R}^{\prime(k)}=\frac{(1+l)^4 }{m (1-l)^2} C_{m, k}+\frac{(1+l)^2}{l} C_{m, R}^{(k-1)}$ and $C_1, C_2, C_3$ are all positive numbers independent of $\varepsilon$. Here in (16), we also assume that
+\begin{equation}\label{eq:17}
+  \frac{\left(\tau_{\varepsilon}+A_{\varepsilon}\right) e^{\zeta\left(\sigma_{\varepsilon}\right)}}{R\left(\sigma_{\varepsilon}\right)}=1
+\end{equation}
+on $X_c$. We will solve \eqref{eq:17} together with \eqref{eq:5} and \eqref{eq:8} in above. 
+
+\subsection{Final jet extensions on \texorpdfstring{$\Omega$}{} via limits}
+
+As $\sup _{t \leq 0}\left(e^t R(t)\right)<\infty$, applying Montel's theorem and \eqref{eq:16} to extract a weak limit of $\left\{F_{c, a, \varepsilon}^{(k)}\right\}_{\varepsilon>0}$ {\color{purple} as $\varepsilon \rightarrow 0$\sidenote[][0pt]{First Limitation.}}, we get a holomorphic $L$-valued $n$-form $F_{c, a}^{(k)}$ on $X_c$ such that $J_{X_c}^k F_{c, a}^{(k)}=f$ and
+ \begin{fullwidth}
+ $$
+ \int_{X_c} \frac{\left|F_{c,a}^{(k)}\right|_L^2}{e^{\sigma} R(\sigma)} e^{-\psi}\mathrm{d} V_X \leq e^{ a} C_{m, R}^{\prime(k)} \int_{Y_c} \frac{|f|_{s, \rho,(k)}^2}{\left|\bigwedge^m(\mathrm{~d} s)\right|^2} e^{-\psi}\mathrm{~d} V_Y+\frac{(1+l)^4 e^a}{m (1-l)^2} C_{m, k} \int_{Y_c} \frac{\left|\nabla^k\left(J^k F^{(k-1)}\right)\right|_L^2}{\left|\bigwedge^m(\mathrm{~d} s)\right|^{2 }} e^{-\psi}\mathrm{~d} V_Y .
+ $$
+\end{fullwidth}
+
+In other words,
+ \begin{fullwidth}
+ \begin{equation}\label{eq:18}
+   \begin{aligned}
+   \int_{X_c} \frac{\left|F_{c, a}^{(k)}\right|_L^2 e^{-\psi}\mathrm{d} V_X}{|s|^{2 m} R\left(m \log |s|^2-a\right)}   
+   & \leq C_{m, R}^{\prime(k)} \int_{Y_c} \frac{|f|_{s, \rho,(k)}^2 e^{-\psi}\mathrm{~d} V_Y}{\left|\bigwedge^m(\mathrm{~d} s)\right|^2} +\frac{(1+l)^4 C_{m, k} }{m (1-l)^2} \int_{Y_c} \frac{\left|\nabla^k\left(J^k F^{(k-1)}\right)\right|_L^2 e^{-\psi}\mathrm{~d} V_Y}{\left|\bigwedge^m(\mathrm{~d} s)\right|^{2}} 
+   \end{aligned}
+ \end{equation}
+\end{fullwidth}
+
+Since $R$ is continuous decreasing on $(-\infty, 0], \sup _{t \leq 0}\left(e^t R(t)\right)<\infty$, similarly as before, we use Montel's theorem and extract a weak limit of $\left\{F_{c, a}^{(k)}\right\}_{a>0}$ {\color{purple} as $a \rightarrow 0$\sidenote[][0pt]{Second Limitation.}}, to obtain a holomorphic $L$-valued $n$-form $F_c^{(k)}$ on $X_c$ from \eqref{eq:18} such that $J_{X_c}^k F_c^{(k)}=f$ and
+ \begin{fullwidth}
+ \begin{equation}\label{eq:19}
+   \int_{X_c} \frac{\left|F_{c}^{(k)}\right|_{L}^2 e^{-\psi}}{|s|^{2 m} R\left(m \log |s|^2\right)} \mathrm{d} V_X \leq C_{m, R}^{\prime(k)} \int_{Y_c} \frac{|f|_{s, \rho,(k)}^2 e^{-\psi}}{\left|\bigwedge^m(\mathrm{~d} s)\right|^2} \mathrm{~d} V_Y+\frac{(1+l)^4 C_{m, k}}{m (1-l)^2}  \int_{Y_c} \frac{\left|\nabla^k\left(J^k F^{(k-1)}\right)\right|_L^2}{\left|\bigwedge^m(\mathrm{~d} s)\right|^2 } e^{-\psi}\mathrm{~d} V_Y .
+ \end{equation}
+\end{fullwidth}
+
+As Popovici \cite[Sections 0.4-0.6]{Popovici2004L2EF} has shown that the last term in the right-hand side of \eqref{eq:19} can be controlled uniformly, a slight modification of his proof in \cite[Section 0.4]{Popovici2004L2EF}  in terms of the variable denominators introduced by \cite[p136]{ZZ18} can complete the proof of Theorem \ref{thm:L2}. Indeed, one just needs to modify the first and second inequalities in \cite[p22]{Popovici2004L2EF}, respectively, as
+ \begin{fullwidth}
+ $$
+ \begin{aligned}
+ & \frac{\sum_{|\alpha|=k}\left|\frac{\frac{\partial^\alpha F^{(k-1)}}{\partial z^{\prime \alpha}}\left(0, z^{\prime \prime}\right)}{\alpha!}\right|^2 e^{-2 \varphi\left(0, z^{\prime \prime}\right)-2 A\left|z^{\prime \prime}\right|^2}}{\left|\bigwedge^m(\mathrm{~d} s)\left(0, z^{\prime \prime}\right)\right|^{2 \frac{(m+k)}{m}}} \\
+ & \leq \text { Const } \cdot \frac{2(m+k)}{\rho^{2(m+k)}} e^{2\left(\varepsilon(\rho)+A \rho^2\right)} \sup _{\left(z^{\prime}, z^{\prime \prime}\right) \in U_j} \frac{\left|s\left(z^{\prime}, z^{\prime \prime}\right)\right|^{2 m} R\left(m \log s\left(z^{\prime}, z^{\prime \prime}\right)^2\right)}{\left|\bigwedge^m(\mathrm{~d} s)\left(0, z^{\prime \prime}\right)\right|^{2 \frac{(m+k)}{m}}} \\
+ & \times \int_{z^{\prime} \in B^{\prime}(0, \rho)} \frac{\left\|F^{(k-1)}\left(z^{\prime}, z^{\prime \prime}\right)\right\|^2}{\left|s\left(z^{\prime}, z^{\prime \prime}\right)\right|^{2 m} R\left(m \log s\left(z^{\prime}, z^{\prime \prime}\right)^2\right)} \mathrm{d} \lambda\left(z^{\prime}\right), 
+ \end{aligned}
+ $$
+\end{fullwidth}
+and
+ \begin{fullwidth}
+ $$
+ \int_{Y_c} \frac{\left|\nabla^k\left(J^k F^{(k-1)}\right)\right|^2}{\left|\bigwedge^m(\mathrm{~d} s)\right|^{2 }} e^{-\psi}\mathrm{~d} V_Y \leq D_{m, k} N M(c) \frac{1}{\rho^{2(m+k)}} e^{2\left(\varepsilon(\rho)+A \rho^2\right)} \int_{\Omega^{\prime}} \frac{\left\|F^{(k-1)}\right\|^2}{|s|^{2 m} R\left(m \log |s|^2\right)} e^{-\psi}\mathrm{d} V_{X, \omega},
+ $$
+\end{fullwidth}
+where
+$$
+M(c):=\sup _{\left(z^{\prime}, z^{\prime \prime}\right) \in \Omega^{\prime}} \frac{\left|s\left(z^{\prime}, z^{\prime \prime}\right)\right|^{2 m} R\left(m \log s\left(z^{\prime}, z^{\prime \prime}\right)^2\right)}{\left|\bigwedge^m(\mathrm{~d} s)\left(0, z^{\prime \prime}\right)\right|^{2 \frac{m+k}{m}}} .
+$$
+
+and $D_{m, k}:=$ Const $\cdot 2(m+k)$. Notice that the smoothness of the function $R$ on $(-\infty, 0]$ ensures that one can get the suprema on $U_j$ and $\Omega^{\prime}$, respectively. We refer to \cite[Section 0.4]{Popovici2004L2EF} for more explanations about the above notations.
+Then as a result, we get a holomorphic $L$-valued $n$-form $F_{c}^{(k)}$ on $\Omega$ such that $J_{\Omega}^k F_{c}^{(k)}=f$ and
+ \begin{fulleq}
+ $$
+ \begin{aligned}
+ \int_{\Omega} \frac{\left|F_{c}^{(k)}\right|_{L}^2 e^{-\psi}}{|s|_E^{2 m} R\left(m \log |s|_E^2\right)} \mathrm{d} V_{X, \omega}  \leq \int_{X_c} \frac{\left|F_{c}^{(k)}\right|_{L}^2 e^{-\psi}}{|s|_E^{2 m} R\left(m \log |s|_E^2\right)} \mathrm{d} V_{X, \omega} 
+ & \leq C_{m, R}^{(k)} \int_{Y_c} \frac{|f|_{s, \rho,(k)}^2}{\left|\bigwedge^m(\mathrm{~d} s)\right|_E^2} e^{-\psi}\mathrm{~d} V_{Y, \omega} \\
+ & \leq C_{m, R}^{(k)} \int_Y \frac{|f|_{s, \rho,(k)}^2}{\left|\bigwedge^m(\mathrm{~d} s)\right|_E^2}  e^{-\psi}\mathrm{~d} V_{Y, \omega},
+ \end{aligned}
+ $$
+\end{fulleq}
+where $C_{m, R}^{(k)}>0$ is a constant depending only on $m, k, E, R$ and $\sup _{\Omega}\|i \Theta(L)\|$.
+
+\subsection{Solving ordinary differential equations}
+
+We have already proved Theorem \ref{thm:main} , provided that there exist appropriate $\chi, \eta, \zeta$ satisfying some assumptions. Now, we will come to use these assumptions about $\chi, \eta, \zeta$ to get their explicit expressions.
+
+Notice that \eqref{eq:5}, \eqref{eq:8} and \eqref{eq:17} are equivalent to the following system of ordinary differential equations defined on $(-\infty, 0)$ :
+$$
+\left\{
+\begin{aligned}
+\chi(t) \zeta^{\prime}(t)-\chi^{\prime}(t) &=1, \\
+(\chi(t)+\eta(t)) e^{\zeta(t)} &=R( t), \\
+\frac{\left(\chi^{\prime}(t)\right)^2}{\chi(t) \zeta^{\prime \prime}(t)-\chi^{\prime \prime}(t)} &=\eta(t).
+\end{aligned}\right.
+$$
+ Moreover, we have assumed that $\zeta, \chi$ and $\eta$ are all smooth on $(-\infty, 0)$ and that $\zeta>0, \chi>0, \eta>0, \zeta^{\prime}>0, \chi^{\prime}<0$ and $\chi(t) \geq-\frac{t}{2}$ on $(-\infty, 0)$. In the proof of Theorem \ref{thm:main}, we have assumed that $C_R=\int_{-\infty}^0 \frac{1}{R(t)} \mathrm{d} t=1$. 
+
+Following the argument of solving undetermined functions with ODEs introduced in \cite[Section 4, pp. 151-153]{ZZ18}, we get
+$$
+\left\{
+\begin{aligned}
+\zeta &=-\log \left(1-\int_{-\infty}^t \frac{1}{R\left( t_1\right)} \mathrm{d} t_1\right), \\
+\chi &=\frac{- t- \int_t^0\left(\int_{-\infty}^{t_2} \frac{1}{R\left( t_1\right)} \mathrm{d} t_1\right) \mathrm{d} t_2}{1-\int_{-\infty}^t \frac{1}{R\left( t_1\right)} \mathrm{d} t_1}, \\
+\eta &=\left(1- \int_{-\infty}^t \frac{1}{R\left( t_1\right)} \mathrm{d} t_1\right) R( t)+\frac{ t+\int_t^0\left(\int_{-\infty}^{t_2} \frac{1}{R\left( t_1\right)} \mathrm{d} t_1\right) \mathrm{d} t_2}{1- \int_{-\infty}^t \frac{1}{R\left( t_1\right)} \mathrm{d} t_1},
+\end{aligned}\right.
+$$
+and
+$$
+\chi^{\prime}+\frac{1}{2}=\left(\frac{-\frac{1}{2}\left(\lambda_1^{\prime}\right)^2+\lambda_1 \lambda_1^{\prime \prime}}{\left(\lambda_1^{\prime}\right)^2}\right) \leq 0 .
+$$
+
+It is easy to verify all the previous assumptions about $\zeta, \chi$ and $\eta$.
+In the end, we have proven the $L^2$-extension  theorem \ref{thm:L2}.
+\end{proof}
+
+Now we will show that the main theorem which is the case of $L^q$-extension is true later.
+
+\section{Proof of the main theorem}
+From now on, we will denote $F^{(k)}$ in theorem \ref{thm:L2} by $F_1^{(k)}$ .
+$K_X$ is naturally equipped with the smooth metric $e^{\varphi_\omega}$ with respect to the dual frame of $d z$. Let $L^{\prime}$ be the line bundle $L$ equipped with the new metric $e^{-\varphi_{L^{\prime}}}$, where $\varphi_{L^{\prime}}:=(2-q) \log \left|F_1\right|_L+\varphi_L$. Then the assumptions in the theorem imply that
+\begin{enumerate}[label=(\roman*)]
+  \item $\sqrt{-1} \Theta_{L^{\prime}}+\sqrt{-1} \partial \bar{\partial} \sigma \geq 0$,
+  \item $\sqrt{-1} \Theta_{L^{\prime}}+\sqrt{-1} \partial \bar{\partial} \sigma \geq \frac{\left\{\sqrt{-1} \Theta_E s, s\right\}_E}{\alpha|s|_E^2}$.
+\end{enumerate}
+
+
+Since the $k$-jet  $f \in H^0\left(X,K_X\otimes L'\otimes \mO_X/\mJ_Y^{k+1}\right)$ satisfies
+$$
+\int_Y \frac{|f|_{L^{\prime},s,\rho,(k)}^2 e^{-\psi}}{\left|\bigwedge^m(\dd s)\right|_E^2} d V_{Y,\omega}=C_f<+\infty,
+$$
+by Theorem \ref{thm:L2}, there exists  $F_2^{(k)}$ on $X$ with values in $K_X \otimes L'$, such that $J^k F_2^{(k)}=f$ on $\Omega$ and
+$$
+\begin{aligned}
+&\int_\Omega \frac{\left|F_2^{(k)}\right|_{L}^2 e^{-\psi}}{\left(\left|F_1^{(k)}\right|_L\right)^{2-q}  |s|^{2m} R(\psi+m\log |s|^2)} d V_{X,\omega}  \\
+=&\int_\Omega \frac{\left|F_2^{(k)}\right|_{L^{\prime}}^2 e^{-\psi}}{|s|^{2m} R(\psi+m\log |s|^2)} d V_{X,\omega}  
+ \leq C_{m,R}^{(k)} \int_Y \frac{|f|_{L^{\prime},s,\rho,(k)}^2 e^{-\psi}}{\left|\bigwedge^m(\dd s)\right|_E^2} d V_{Y,\omega}  
+ =C_{m,R}^{(k)} C_f .
+\end{aligned}
+$$
+
+Then H\"older's inequality gives that
+$$
+\begin{aligned}
+C_{F_2^{(k)}}  &:=\int_\Omega \frac{\left(\left|F_2^{(k)}\right|_{L}\right)^q   e^{-\psi}}{|s|^{2m} R(\psi+m\log |s|^2)} d V_{X,\omega} \\
+& \leq\left(\int_\Omega \frac{\left|F_2^{(k)}\right|_{L}^2  e^{-\psi}}{\left(\left|F_1^{(k)}\right|_{L'}\right)^{2-q} |s|^{2m} R(\psi+m\log |s|^2)} d V_{X,\omega}\right)^{\frac{q}{2}}\left(\int_\Omega \frac{\left(\left|F_1^{(k)}\right|_{L}\right)^q e^{-\psi}}{|s|^{2m} R(\psi+m\log |s|^2)} d V_{X,\omega}\right)^{1-\frac{q}{2}} \\
+& \leq\left(C_{m,R}^{(k)} C_f\right)^{\frac{q}{2}}\left(C_{F_1^{(k)}}\right)^{1-\frac{q}{2}} .
+\end{aligned}
+$$
+
+We can then repeat the same argument with $F_1^{(k)}$ replaced by $F_2^{(k)}$, etc., and get a sequence of holomorphic extensions $\left\{F_s^{(k)}\right\}_{s=1}^{+\infty}$ of $f$ and a sequence $\left\{C_{F_s^{(k)}}\right\}_{s=1}^{+\infty}$ such that
+\begin{equation}\label{eq:7.1}\color{purple}
+  C_{F_{s+1}^{(k)}} \leq\left(C_{m,R}^{(k)} C_f\right)^{\frac{q}{2}}\left(C_{F_s^{(k)}}\right)^{1-\frac{q}{2}}, \quad s=1,2, \cdots .
+\end{equation}
+\begin{enumerate}[label=(\Roman*)]
+  \item If $C_{F_s}^{(k)} \leq C_{m,R}^{(k)} C_f$ for some $C_{F_s}^{(k)}$, then we finish the proof since $F_s^{(k)}$ can be regarded as the desired $k$-jet  extension $F^{(k)}$ in the conclusion.
+  \item If $C_{F_s^{(k)}}>C_{m,R}^{(k)} C_f$ for any $k$, then $C_{F_{s+1}^{(k)}}<C_{F_s^{(k)}}$ for any $s$. Since $\varphi_L$ is locally bounded above and $e^\sigma R(\sigma)$ is bounded above, applying Montel's theorem and extracting weak limits of $\left\{F_s^{(k)}\right\}_{s=1}^{+\infty}$, we can get from \eqref{eq:7.1} a $k$-jet $F^{(k)}$  on $X$ with values in $K_X \otimes L$, such that $J^k F^{(k)}=f$ on $\Omega$ and
+$$
+\int_\Omega \frac{\left(|F^{(k)}|_L\right)^q e^{-\psi}}{|s|^{2m} R(\psi+m\log |s|^2)} d V_X \leq C_{m,R}^{(k)}C_f .
+$$
+\end{enumerate}
+Theorem \ref{thm:main} is, thus, proved.
+
+
+
+
+
+
+\newgeometry{left=2cm,right=2cm,bottom=2cm,top=3cm}
+%
+\printbibliography[heading=bibintoc]
+ %
+\end{document}
